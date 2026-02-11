@@ -14,3 +14,22 @@ services:
     volumes:
       - mongo_data:/data/db # data persistence
       - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+
+    networks:
+      - app_network
+
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+
+volumes:
+  mongo_data:
+
+networks:
+  app_network:
+    driver: bridge
+  networks:
+
