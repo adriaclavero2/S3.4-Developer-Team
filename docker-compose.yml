@@ -1,0 +1,16 @@
+services:
+  mongodb:
+    image: mongo:8.2
+    container_name: calendar_appMDB
+    restart: unless-stopped
+    ports:
+      - "27017:27017"  # HOST:CONTAINER
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
+
+    volumes:
+      - mongo_data:/data/db # data persistence
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
