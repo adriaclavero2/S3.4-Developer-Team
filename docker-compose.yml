@@ -12,7 +12,7 @@ services:
       MONGO_INITDB_DATABASE: ${MONGO_DB}
 
     volumes:
-      - mongo_data:/data/db # data persistence
+      - mongo-data:/data/db # data persistence
       - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
 
     networks:
@@ -26,10 +26,8 @@ services:
 
 
 volumes:
-  mongo_data:
+  mongo-data:
 
 networks:
   app_network:
     driver: bridge
-  networks:
-

@@ -1,12 +1,19 @@
-db = db.getSibilingDB(process.env.MONGO_INIT_DATABASE || 'calendar_app');
+db = db.getSiblingDB(process.env.MONGO_INITDB_DATABASE || 'calendar_app');
 
 db.createUser({
     user: 'app_user',
     pwd: 'app_password',
-    roles: [{role: 'readWrite', db: process.env.MONGO_INIT_DATABASE}]
+    roles: [{
+        role: 'readWrite',
+        db: process.env.MONGO_INITDB_DATABASE || 'calendar_app'
+    }]
 });
 
 db.createCollection('health_check');
-db.health_check.insertOne({status: 'ok', timestamp: new Date()});
 
-print('MongoDB correctly initialized.');
+db.health_check.insertOne({
+    status: 'ok',
+    timestamp: new Date(),
+    message: 'Database successfully initialized'});
+
+print('MongoDB successfully initialized.');
