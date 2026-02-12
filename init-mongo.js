@@ -10,6 +10,9 @@ db.createUser({
 });
 
 db.createCollection('health_check');
+db.createCollection('tasks');
+db.createCollection('notes');
+db.createCollection('events');
 
 db.health_check.insertOne({
     status: 'ok',
