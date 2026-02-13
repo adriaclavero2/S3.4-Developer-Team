@@ -1,5 +1,6 @@
 package task.repository;
 
+import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
 import task.model.Task;
 
@@ -7,15 +8,20 @@ import java.util.List;
 import java.util.Optional;
 
 public class TaskRepositoryImplementation implements TaskRepository{
-    private final TaskDAO dao;
+    private final TaskDAO taskDAO;
 
-    public TaskRepositoryImplementation(TaskDAO dao) {
-        this.dao = dao;
+    public TaskRepositoryImplementation(TaskDAO taskDAO) {
+        this.taskDAO = taskDAO;
     }
 
     @Override
-    public Task create(Task entity) {
-        return null;
+    public void create(Task entity) {
+        try {
+            taskDAO.save(entity);
+            System.out.println("Log: task created successfully");
+        } catch (DataAccessException e) {
+            throw new DataAccessException("MongoDB" + e);
+        }
     }
 
     @Override
