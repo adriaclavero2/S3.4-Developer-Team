@@ -1,6 +1,13 @@
 package common.persistance;
 
-public interface Repository {
+import java.util.List;
+import java.util.Optional;
 
-    T get(T);
+public interface Repository<T, ID> {
+
+    T create(T entity);
+    Optional<T> getById(ID id);
+    List<T> getAll();
+    void modify(T entity);
+    void remove(ID id);
 }
