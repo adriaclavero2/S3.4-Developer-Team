@@ -38,7 +38,7 @@ public class TaskCopyBuilder {
             if (original == null) {
                 throw new IllegalArgumentException("Cannot copy null task");
             }
-            if (original.getId() == 0) {
+            if (original.getId().isEmpty() || original.getId() == null) {
                 throw new IllegalStateException("Cannot copy task without ID (not persisted yet)");
             }
             this.original = original;
