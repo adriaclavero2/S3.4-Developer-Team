@@ -1,8 +1,9 @@
-package task.repository;
+package infrastructure.mongo.dao;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import common.exception.DataAccessException;
+import common.persistance.TaskDAO;
 import org.bson.Document;
 import task.model.Task;
 

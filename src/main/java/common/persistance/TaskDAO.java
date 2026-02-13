@@ -1,6 +1,5 @@
-package task.repository;
+package common.persistance;
 
-import common.persistance.GenericDAO;
 import task.model.Task;
 import java.util.List;
 
