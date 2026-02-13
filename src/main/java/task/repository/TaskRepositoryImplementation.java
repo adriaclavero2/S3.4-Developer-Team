@@ -2,10 +2,10 @@ package task.repository;
 
 import common.persistance.TaskDAO;
 
-public class TaskRepository {
+public class TaskRepositoryImplementation {
     private final TaskDAO dao;
 
-    public TaskRepository(TaskDAO dao) {
+    public TaskRepositoryImplementation(TaskDAO dao) {
         this.dao = dao;
     }
 }
