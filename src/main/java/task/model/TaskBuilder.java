@@ -1,9 +1,9 @@
-package task.creation;
+package task.model;
 
 import task.model.Task;
 import task.enums.Priority;
 import task.enums.TaskState;
-import task.exceptions.InvalidTaskTitleException;
+import common.exception.InvalidTaskTitleException;
 import task.exceptions.TaskExpireDateInPastException;
 import java.time.LocalDateTime;
 
