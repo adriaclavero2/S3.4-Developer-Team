@@ -12,4 +12,9 @@ public class MongoBuilder implements ConnectionStringBuilder {
                 props.getProperty("MONGO_HOST"),
                 props.getProperty("MONGO_PORT"));
     }
+
+    @Override
+    public String getDbName(Properties props) {
+        return props.getProperty("MONGO_DB");
+    }
 }
