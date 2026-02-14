@@ -1,4 +1,7 @@
 package common.config;
 
-public interface ConnectionBuilder {
+import java.util.Properties;
+
+public interface ConnectionStringBuilder {
+    String stringBuild(Properties props);
 }
