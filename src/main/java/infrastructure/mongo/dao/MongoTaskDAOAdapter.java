@@ -6,6 +6,8 @@ import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
 import org.bson.Document;
 import task.model.Task;
+import task.model.TaskBuilder;
+import task.model.TaskCopyBuilder;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +27,7 @@ public class MongoTaskDAOAdapter implements TaskDAO {
             Document doc = new Document()
                     .append("title", entity.getTitle())
                     .append("description", entity.getDescription())
-                    .append("expiredAt", entity.getExpirationDate().toString() != null ? entity.getExpirationDate().toString() : null)
+                    .append("expiredAt", entity.getExpireDate().toString() != null ? entity.getExpireDate().toString() : null)
                     .append("priority", entity.getPriority().name())
                     .append("status", entity.getTaskState().name())
                     .append("createdAt", entity.getCreationDate().toString());
@@ -34,10 +36,14 @@ public class MongoTaskDAOAdapter implements TaskDAO {
 
             String generatedId = doc.getObjectId("_id").toHexString();
 
-            Task taskWithId = new Task.Builder()
-                    .copyFrom(entity)
-                    .setId(generatedId)
-                    .build();
+           /* Task taskWithId = new TaskCopyBuilder()
+                        .copyOf(entity)
+                        .  setId(generatedId)
+                        .build();
+
+                esto se implementera en el caso de necesita una copia de Task con el ID
+            */
+
         } catch (MongoException e) {
             throw new DataAccessException("MongoDB", e);
         }
