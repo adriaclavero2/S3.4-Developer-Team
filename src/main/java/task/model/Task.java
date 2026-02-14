@@ -25,6 +25,15 @@ public class Task {
         this.title = title;
     }
 
+    protected Task(String title, String description, LocalDateTime expireDate, Priority priority, TaskState taskState) {
+        this.title = title;
+        this.description = description;
+        this.expireDate = expireDate;
+        this.creationDate = LocalDateTime.now();
+        this.priority = priority;
+        this.taskState = taskState;
+    }
+
     // Getters and Setters
     public String getId() {
         return id;
