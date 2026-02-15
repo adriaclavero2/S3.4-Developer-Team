@@ -15,6 +15,7 @@ public class TaskCopyBuilder {
         CopyBuilderSteps expireDate(LocalDateTime expireDate);
         CopyBuilderSteps priority(Priority priority);
         CopyBuilderSteps taskState(TaskState taskState);
+        CopyBuilderSteps setId(String id);
         Task build();
     }
 
