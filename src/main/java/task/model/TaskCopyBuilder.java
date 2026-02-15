@@ -4,7 +4,7 @@ import task.model.Task;
 import task.enums.Priority;
 import task.enums.TaskState;
 import common.exception.InvalidTaskTitleException;
-import task.exceptions.TaskExpireDateInPastException;
+import common.exception.TaskExpireDateInPastException;
 import java.time.LocalDateTime;
 
 public class TaskCopyBuilder {
