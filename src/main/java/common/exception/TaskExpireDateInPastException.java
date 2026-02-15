@@ -1,4 +1,4 @@
-package task.exceptions;
+package common.exception;
 
 public class TaskExpireDateInPastException extends RuntimeException {
     public TaskExpireDateInPastException(String message) {
