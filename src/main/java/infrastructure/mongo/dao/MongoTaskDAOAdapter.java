@@ -8,7 +8,6 @@ import common.persistance.TaskDAO;
 import infrastructure.mongo.connection.MongoDBConnection;
 import org.bson.Document;
 import task.model.Task;
-import task.model.TaskBuilder;
 import task.model.TaskCopyBuilder;
 
 import java.util.List;
@@ -38,6 +37,8 @@ public class MongoTaskDAOAdapter implements TaskDAO {
             collection.insertOne(doc);
 
             String generatedId = doc.getObjectId("_id").toHexString();
+
+            entity.setId(generatedId);
 
            Task taskWithId = new TaskCopyBuilder()
                         .copyOf(entity)
