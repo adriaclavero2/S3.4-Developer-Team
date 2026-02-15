@@ -1,7 +1,10 @@
 package task.repository;
 
+import com.mongodb.client.MongoCollection;
 import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
+import infrastructure.mongo.dao.MongoTaskDAOAdapter;
+import org.bson.Document;
 import task.model.Task;
 
 import java.util.List;
