@@ -63,6 +63,20 @@ public class MongoTaskDAOAdapter implements TaskDAO {
 
     @Override
     public void update(Task entity) {
+        try {
+            Document query = new Document("_id", new org.bson.types.ObjectId(entity.getId()));/*Metodo de Mongo que toma el String hexadecimal y lo convierte en binario  */
+
+            Document updates = new Document()
+                    .append("title", entity.getTitle())
+                    .append("description", entity.getDescription())
+                    .append("expiredAt", entity.getExpireDate() != null ? entity.getExpireDate().toString() : null)
+                    .append("priority", entity.getPriority().name())
+                    .append("status", entity.getTaskState().name());
+
+            collection.updateOne(query, new Document("$set", updates)); /*Metodo de Mongo para update. En new Document "$set" lo va a interpretar como la funcion set de mongo y modifica el elemento en el server. las key que comienzan con $ se interpretan como operadores de accion*/
+        } catch (Exception e) {
+            throw new DataAccessException("MongoDB update", e);
+        }
 
     }
 
