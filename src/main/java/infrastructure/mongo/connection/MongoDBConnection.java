@@ -1,5 +1,6 @@
 package infrastructure.mongo.connection;
 
+import com.mongodb.ConnectionString;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
@@ -14,26 +15,30 @@ public class MongoDBConnection {
 
     public static MongoDatabase getDatabase() {
         if (database == null) {
-            synchronized ( (MongoDBConnection.class)) {
-                if (database == null) {
-                    try {
-                        String connectionString = DatabaseConfig.getConnectionString(DBType.MONGO);
-                        String dbName = DatabaseConfig.getDbName(DBType.MONGO);
-
-                        mongoClient = MongoClients.create(connectionString);
-                        database = mongoClient.getDatabase(dbName);
-
-                        System.out.println("Successful connection to MongoDB: " + dbName);
-                    } catch (Exception e) {
-                        throw new RuntimeException("Error connecting to MongoDB: ", e);
-                    }
-                }
-            }
+            initializeMongoDB();
         }
         return database;
     }
 
-    // .close() method is missing
+    private static void initializeMongoDB() {
+        synchronized ( (MongoDBConnection.class)) {
+            if (database == null) {
+                try {
+                    String connectionString = DatabaseConfig.getConnectionString(DBType.MONGO);
+                    String dbName = DatabaseConfig.getDbName(DBType.MONGO);
+
+                    mongoClient = MongoClients.create(connectionString);
+                    database = mongoClient.getDatabase(dbName);
+
+                    System.out.println("Successful connection to MongoDB: " + dbName);
+                } catch (Exception e) {
+                    // semantic exception??
+                    throw new RuntimeException("Error connecting to MongoDB: ", e);
+                }
+            }
+        }
+    }
+
     public static void close() {
         if(mongoClient != null) {
             mongoClient.close();
