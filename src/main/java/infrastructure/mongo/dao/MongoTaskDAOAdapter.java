@@ -2,8 +2,10 @@ package infrastructure.mongo.dao;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
+import infrastructure.mongo.connection.MongoDBConnection;
 import org.bson.Document;
 import task.model.Task;
 import task.model.TaskBuilder;
@@ -17,8 +19,9 @@ public class MongoTaskDAOAdapter implements TaskDAO {
 
     private final MongoCollection<Document> collection;
 
-    public MongoTaskDAOAdapter(MongoCollection<Document> collection) {
-        this.collection = collection;
+    public MongoTaskDAOAdapter() {
+        MongoDatabase database = MongoDBConnection.getDatabase();
+        this.collection = database.getCollection("tasks");
     }
 
     @Override
@@ -27,7 +30,7 @@ public class MongoTaskDAOAdapter implements TaskDAO {
             Document doc = new Document()
                     .append("title", entity.getTitle())
                     .append("description", entity.getDescription())
-                    .append("expiredAt", entity.getExpireDate().toString() != null ? entity.getExpireDate().toString() : null)
+                    .append("expiredAt", entity.getExpireDate() != null ? entity.getExpireDate().toString() : null)
                     .append("priority", entity.getPriority().name())
                     .append("status", entity.getTaskState().name())
                     .append("createdAt", entity.getCreationDate().toString());
