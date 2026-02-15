@@ -28,12 +28,14 @@ public class TaskCopyBuilder {
         private LocalDateTime expireDate = null;
         private Priority priority = null;
         private TaskState taskState = null;
+        private String id = null;
 
         private boolean titleSet = false;
         private boolean descriptionSet = false;
         private boolean expireDateSet = false;
         private boolean prioritySet = false;
         private boolean taskStateSet = false;
+        private boolean idSet = false;
 
         private CopyBuilder(Task original) {
             if (original == null) {
