@@ -36,6 +36,12 @@ public class TaskRepositoryImplementation implements TaskRepository{
 
     @Override
     public void modify(Task entity) {
+        try {
+            taskDAO.update(entity);
+            System.out.println("Log: task updated successfully");
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error modifying task: " + e.getMessage());
+        }
 
     }
 
