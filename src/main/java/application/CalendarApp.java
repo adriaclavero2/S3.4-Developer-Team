@@ -1,15 +1,23 @@
 package application;
 
+import task.model.Task;
+import task.model.TaskBuilder;
+import task.repository.TaskRepositoryImplementation;
+import task.service.TaskService;
+
 public class CalendarApp {
     public static void main(String[] args) {
         System.out.println();
+        com.mongodb.client.MongoDatabase db = null;
         try {
             // Esto dispara todo el sistema de builders y config que hiciste
-            var db = infrastructure.mongo.connection.MongoDBConnection.getDatabase();
+            db = infrastructure.mongo.connection.MongoDBConnection.getDatabase();
 
             // Si llegamos aquí, la conexión es real
             System.out.println("✅ CONECTADO AL CONTENEDOR DOCKER");
             System.out.println("🔌 Trabajando en la DB: " + db.getName());
+
+            db.listCollectionNames();
 
             // Una pequeña prueba extra: listar colecciones
             for (String name : db.listCollectionNames()) {
@@ -19,5 +27,12 @@ public class CalendarApp {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        Task newTask = TaskBuilder.newTask()
+                .title("Comprar el pan")
+                .build();
+
+        TaskService taskService = new TaskService(db);
+        taskService.createTask(newTask);
     }
 }
