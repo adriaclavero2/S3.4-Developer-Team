@@ -32,4 +32,12 @@ public class MongoDBConnection {
         }
         return database;
     }
+
+    // .close() method is missing
+    public static void close() {
+        if(mongoClient != null) {
+            mongoClient.close();
+            System.out.println("Connection successfully close.");
+        }
+    }
 }
