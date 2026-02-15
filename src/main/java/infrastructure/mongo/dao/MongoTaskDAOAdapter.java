@@ -82,7 +82,11 @@ public class MongoTaskDAOAdapter implements TaskDAO {
 
     @Override
     public void delete(String id) {
-
+        try {
+            collection.deleteOne(new Document("_id", new org.bson.types.ObjectId(id)));
+        } catch (Exception e) {
+            throw new DataAccessException("MongoDB delete", e);
+        }
     }
 
     @Override
