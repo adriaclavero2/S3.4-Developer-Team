@@ -39,13 +39,10 @@ public class MongoTaskDAOAdapter implements TaskDAO {
 
             String generatedId = doc.getObjectId("_id").toHexString();
 
-           /* Task taskWithId = new TaskCopyBuilder()
+           Task taskWithId = new TaskCopyBuilder()
                         .copyOf(entity)
-                        .  setId(generatedId)
+                        .setId(generatedId)
                         .build();
-
-                esto se implementera en el caso de necesita una copia de Task con el ID
-            */
 
         } catch (MongoException e) {
             throw new DataAccessException("MongoDB", e);
