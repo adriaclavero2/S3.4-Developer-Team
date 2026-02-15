@@ -25,7 +25,7 @@ public class TaskRepositoryImplementation implements TaskRepository{
     }
 
     @Override
-    public Optional<Task> getById(String s) {
+    public Optional<Task> getById(String id) {
         return Optional.empty();
     }
 
@@ -46,7 +46,13 @@ public class TaskRepositoryImplementation implements TaskRepository{
     }
 
     @Override
-    public void remove(String s) {
+    public void remove(String id) {
+        try {
+            taskDAO.delete(id);
+            System.out.println("Log: task deleted successfully");
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error al eliminar la tarea: " + e.getMessage());
+        }
 
     }
 
