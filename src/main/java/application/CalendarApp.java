@@ -23,6 +23,7 @@ public class CalendarApp {
             // Una pequeña prueba extra: listar colecciones
             for (String name : db.listCollectionNames()) {
                 System.out.println("📁 Colección encontrada: " + name);
+            }
 
             Task newTask = TaskBuilder.newTask()
                     .title("Prueba de Fuego")
@@ -37,7 +38,7 @@ public class CalendarApp {
             System.out.println("🆔 ID generado: " + newTask.getId());
 
 
-            }
+
 
         } catch (Exception e) {
             e.printStackTrace();
