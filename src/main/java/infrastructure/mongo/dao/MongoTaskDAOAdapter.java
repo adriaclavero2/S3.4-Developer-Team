@@ -27,7 +27,7 @@ public class MongoTaskDAOAdapter implements TaskDAO {
             Document doc = new Document()
                     .append("title", entity.getTitle())
                     .append("description", entity.getDescription())
-                    .append("expiredAt", entity.getExpireDate().toString() != null ? entity.getExpireDate().toString() : null)
+                    .append("expiredAt", entity.getExpireDate() != null ? entity.getExpireDate().toString() : null)
                     .append("priority", entity.getPriority().name())
                     .append("status", entity.getTaskState().name())
                     .append("createdAt", entity.getCreationDate().toString());
