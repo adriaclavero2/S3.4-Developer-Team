@@ -7,9 +7,7 @@ import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
 import infrastructure.mongo.connection.MongoDBConnection;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import task.model.Task;
-import task.model.TaskCopyBuilder;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,29 +25,16 @@ public class MongoTaskDAOAdapter implements TaskDAO {
     @Override
     public void save(Document doc) {
         try {
-           /* Document doc = new Document()
-                    .append("title", entity.getTitle())
-                    .append("description", entity.getDescription())
-                    .append("expiredAt", entity.getExpireDate() != null ? entity.getExpireDate().toString() : null)
-                    .append("priority", entity.getPriority().name())
-                    .append("status", entity.getTaskState().name())
-                    .append("createdAt", entity.getCreationDate().toString());*/
-
+            if (doc == null || doc.isEmpty()) {
+                throw new IllegalArgumentException("The document can't be empty");
+            }
+            if (!doc.containsKey("title")) {
+                throw new IllegalArgumentException("The task must have a title");
+            }
             collection.insertOne(doc);
-
-            //String generatedId = doc.getObjectId("_id").toHexString();
-
-           /*entity.setId(generatedId);
-
-           Task taskWithId = new TaskCopyBuilder()
-                        .copyOf(entity)
-                        .setId(generatedId)
-                        .build();*/
-
         } catch (MongoException e) {
             throw new DataAccessException("MongoDB", e);
         }
-
     }
 
     @Override
@@ -65,16 +50,17 @@ public class MongoTaskDAOAdapter implements TaskDAO {
     @Override
     public void update(Document doc) {
         try {
-           /*Document query = new Document("_id", new org.bson.types.ObjectId(entity.getId()));/*Metodo de Mongo que toma el String hexadecimal y lo convierte en binario
+            Object idValue = doc.get("_id");
+            if (idValue == null) {
+                throw new IllegalArgumentException("The document must have a -id to be update");
+            }
 
-            Document updates = new Document()
-                    .append("title", entity.getTitle())
-                    .append("description", entity.getDescription())
-                    .append("expiredAt", entity.getExpireDate() != null ? entity.getExpireDate().toString() : null)
-                    .append("priority", entity.getPriority().name())
-                    .append("status", entity.getTaskState().name());*/
+            Document filter = new Document("_id", idValue);
 
-            collection.updateOne(doc.get("_id"), new Document("$set", doc)); /*Metodo de Mongo para update. En new Document "$set" lo va a interpretar como la funcion set de mongo y modifica el elemento en el server. las key que comienzan con $ se interpretan como operadores de accion*/
+            Document docToUpdate = new Document(doc);
+            docToUpdate.remove("_id");
+
+            collection.updateOne(filter, new Document("$set", docToUpdate)); /*Metodo de Mongo para update. En new Document "$set" lo va a interpretar como la funcion set de mongo y modifica el elemento en el server. las key que comienzan con $ se interpretan como operadores de accion*/
         } catch (Exception e) {
             throw new DataAccessException("MongoDB update", e);
         }
