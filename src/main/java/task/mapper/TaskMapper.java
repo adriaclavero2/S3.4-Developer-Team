@@ -1,6 +1,6 @@
 package task.mapper;
 
-import common.utils.GenericMapper;
+import common.utils.Mapper;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import task.enums.Priority;
@@ -10,7 +10,7 @@ import task.model.TaskBuilder;
 
 import java.time.LocalDateTime;
 
-public class TaskMapper implements GenericMapper <Task, Document> {
+public class TaskMapper implements Mapper<Task, Document> {
     @Override
     public Document toDocument(Task task) {
         return new Document()
