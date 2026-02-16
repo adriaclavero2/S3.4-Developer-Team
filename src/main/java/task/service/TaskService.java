@@ -1,19 +1,15 @@
 package task.service;
 
-import com.mongodb.client.MongoDatabase;
-import common.persistance.Repository;
-import infrastructure.mongo.dao.MongoTaskDAOAdapter;
+
 import task.model.Task;
-import task.model.TaskDTO;
 import task.repository.TaskRepository;
-import task.repository.TaskRepositoryImplementation;
+import task.repository.TaskRepositoryImpl;
 
 public class TaskService {
     private TaskRepository repository;
 
-    public TaskService(MongoDatabase database) {
-        this.repository = new TaskRepositoryImplementation(
-                new MongoTaskDAOAdapter(database.getCollection("tasks")));
+    public TaskService() {
+        this.repository = new TaskRepositoryImpl();
     }
 
     public void createTask(Task newTask) {

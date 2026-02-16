@@ -2,7 +2,6 @@ package application;
 
 import task.model.Task;
 import task.model.TaskBuilder;
-import task.repository.TaskRepositoryImplementation;
 import task.service.TaskService;
 
 public class CalendarApp {
@@ -32,7 +31,7 @@ public class CalendarApp {
                 .title("Comprar el pan")
                 .build();
 
-        TaskService taskService = new TaskService(db);
+        TaskService taskService = new TaskService();
         taskService.createTask(newTask);
     }
 }
