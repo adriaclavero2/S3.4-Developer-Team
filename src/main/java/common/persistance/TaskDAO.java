@@ -1,9 +1,10 @@
 package common.persistance;
 
+import org.bson.Document;
 import task.model.Task;
 import java.util.List;
 
-public interface TaskDAO extends GenericDAO<Task, String> {
+public interface TaskDAO extends GenericDAO<Document, String> {
 
     List<Task> findCompletedTasks();
 }
