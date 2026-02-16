@@ -10,7 +10,8 @@ public class Task {
     private String title;
     private String description;
     private LocalDateTime expireDate;
-    private final LocalDateTime creationDate;
+    // visibility modifier changed;
+    private LocalDateTime creationDate;
     private Priority priority;
     private TaskState taskState;
 
@@ -39,32 +40,16 @@ public class Task {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public LocalDateTime getExpireDate() {
         return expireDate;
-    }
-
-    public void setExpireDate(LocalDateTime expireDate) {
-        this.expireDate = expireDate;
     }
 
     public LocalDateTime getCreationDate() {
@@ -75,12 +60,31 @@ public class Task {
         return priority;
     }
 
-    public void setPriority(Priority priority) {
-        this.priority = priority;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public TaskState getTaskState() {
         return taskState;
+    }
+
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setCreationDate(LocalDateTime creationDate) { this.creationDate = creationDate;}
+
+    public void setExpireDate(LocalDateTime expireDate) {
+        this.expireDate = expireDate;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
     }
 
     public void setTaskState(TaskState taskState) {
