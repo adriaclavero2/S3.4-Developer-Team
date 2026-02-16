@@ -1,11 +1,8 @@
-package task.model;
-
-import task.enums.Priority;
-
-import java.time.LocalDateTime;
+package task.dto;
 
 public record TaskDTO(
         String title,
         String description,
-        LocalDateTime expireDate,
-        Priority priority) {}
+        String expireDate,
+        String priority
+) {}
