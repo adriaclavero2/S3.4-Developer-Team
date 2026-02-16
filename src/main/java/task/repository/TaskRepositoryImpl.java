@@ -2,29 +2,27 @@ package task.repository;
 
 import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
-import common.utils.GenericMapper;
+import common.utils.Mapper;
+import infrastructure.mongo.dao.MongoTaskDAOAdapter;
 import org.bson.Document;
+import task.mapper.TaskMapper;
 import task.model.Task;
+
 import java.util.List;
 import java.util.Optional;
 
-public class TaskRepositoryImplementation implements TaskRepository{
-
+public class TaskRepositoryImpl implements TaskRepository{
     private final TaskDAO taskDAO;
-    private final GenericMapper mapper = new GenericMapper() {
-        @Override
-        public Object toDocument(Object o) {
-            return null;
-        }
+    private final Mapper<Task,Document> mapper;
 
-        @Override
-        public Object toDomain(Object o) {
-            return null;
-        }
-    };
+    public TaskRepositoryImpl() {
+        this.taskDAO = new MongoTaskDAOAdapter();
+        this.mapper = new TaskMapper();
+    }
 
-    public TaskRepositoryImplementation(TaskDAO taskDAO) {
+    public TaskRepositoryImpl(TaskDAO taskDAO, Mapper<Task,Document> mapper) {
         this.taskDAO = taskDAO;
+        this.mapper = mapper;
     }
 
     @Override

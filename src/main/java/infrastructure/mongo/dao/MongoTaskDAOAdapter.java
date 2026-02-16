@@ -8,6 +8,8 @@ import common.persistance.TaskDAO;
 import infrastructure.mongo.connection.MongoDBConnection;
 import org.bson.Document;
 import task.model.Task;
+import task.model.TaskBuilder;
+import task.model.TaskCopyBuilder;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +37,7 @@ public class MongoTaskDAOAdapter implements TaskDAO {
         } catch (MongoException e) {
             throw new DataAccessException("MongoDB", e);
         }
+
     }
 
     @Override
