@@ -25,20 +25,15 @@ public class MongoTaskDAOAdapter implements TaskDAO {
     }
 
     @Override
-    public void save(Document newDocument) {
+    public void save(Document doc) {
         try {
-            collection.insertOne(newDocument);
-
-            String generatedId = newDocument.getObjectId("_id").toHexString();
-
-           /* Task taskWithId = new TaskCopyBuilder()
-                        .copyOf(entity)
-                        .  setId(generatedId)
-                        .build();
-
-                esto se implementera en el caso de necesita una copia de Task con el ID
-            */
-
+            if (doc == null || doc.isEmpty()) {
+                throw new IllegalArgumentException("The document can't be empty");
+            }
+            if (!doc.containsKey("title")) {
+                throw new IllegalArgumentException("The task must have a title");
+            }
+            collection.insertOne(doc);
         } catch (MongoException e) {
             throw new DataAccessException("MongoDB", e);
         }
@@ -56,13 +51,32 @@ public class MongoTaskDAOAdapter implements TaskDAO {
     }
 
     @Override
-    public void update(Document entity) {
+    public void update(Document doc) {
+        try {
+            Object idValue = doc.get("_id");
+            if (idValue == null) {
+                throw new IllegalArgumentException("The document must have a -id to be update");
+            }
+
+            Document filter = new Document("_id", idValue);
+
+            Document docToUpdate = new Document(doc);
+            docToUpdate.remove("_id");
+
+            collection.updateOne(filter, new Document("$set", docToUpdate)); /*Metodo de Mongo para update. En new Document "$set" lo va a interpretar como la funcion set de mongo y modifica el elemento en el server. las key que comienzan con $ se interpretan como operadores de accion*/
+        } catch (Exception e) {
+            throw new DataAccessException("MongoDB update", e);
+        }
 
     }
 
     @Override
     public void delete(String id) {
-
+        try {
+            collection.deleteOne(new Document("_id", new org.bson.types.ObjectId(id)));
+        } catch (Exception e) {
+            throw new DataAccessException("MongoDB delete", e);
+        }
     }
 
     @Override

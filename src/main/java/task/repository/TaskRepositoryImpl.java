@@ -28,8 +28,8 @@ public class TaskRepositoryImpl implements TaskRepository{
     @Override
     public void create(Task entity) {
         try {
-            Document newDocument = mapper.toDocument(entity);
-            taskDAO.save(newDocument);
+            Document doc = mapper.toDocument(entity);
+            taskDAO.save(doc);
             System.out.println("Log: task created successfully");
         } catch (DataAccessException e) {
             throw new DataAccessException("MongoDB" + e);
@@ -37,22 +37,41 @@ public class TaskRepositoryImpl implements TaskRepository{
     }
 
     @Override
-    public Optional<Task> getById(String s) {
+    public Optional<Task> getById(String id) {
         return Optional.empty();
     }
 
     @Override
     public List<Task> getAll() {
+        try {
+            taskDAO.findAll();
+            System.out.println("Log: task list all successfully");
+        } catch (DataAccessException e) {
+            throw new DataAccessException("MongoDB", e);
+        }
         return List.of();
     }
 
     @Override
     public void modify(Task entity) {
+        try {
+            Document doc = mapper.toDocument(entity);
+            taskDAO.update(doc);
+            System.out.println("Log: task updated successfully");
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error modifying task: " + e.getMessage());
+        }
 
     }
 
     @Override
-    public void remove(String s) {
+    public void remove(String id) {
+        try {
+            taskDAO.delete(id);
+            System.out.println("Log: task deleted successfully");
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error al eliminar la tarea: " + e.getMessage());
+        }
 
     }
 

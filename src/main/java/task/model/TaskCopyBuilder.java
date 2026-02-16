@@ -4,7 +4,7 @@ import task.model.Task;
 import task.enums.Priority;
 import task.enums.TaskState;
 import common.exception.InvalidTaskTitleException;
-import task.exceptions.TaskExpireDateInPastException;
+import common.exception.TaskExpireDateInPastException;
 import java.time.LocalDateTime;
 
 public class TaskCopyBuilder {
@@ -15,6 +15,7 @@ public class TaskCopyBuilder {
         CopyBuilderSteps expireDate(LocalDateTime expireDate);
         CopyBuilderSteps priority(Priority priority);
         CopyBuilderSteps taskState(TaskState taskState);
+        CopyBuilderSteps setId(String id);
         Task build();
     }
 
@@ -27,20 +28,22 @@ public class TaskCopyBuilder {
         private LocalDateTime expireDate = null;
         private Priority priority = null;
         private TaskState taskState = null;
+        private String id = null;
 
         private boolean titleSet = false;
         private boolean descriptionSet = false;
         private boolean expireDateSet = false;
         private boolean prioritySet = false;
         private boolean taskStateSet = false;
+        private boolean idSet = false;
 
         private CopyBuilder(Task original) {
             if (original == null) {
                 throw new IllegalArgumentException("Cannot copy null task");
             }
-            if (original.getId().isEmpty() || original.getId() == null) {
+          /*  if (original.getId().isEmpty() || original.getId() == null) {
                 throw new IllegalStateException("Cannot copy task without ID (not persisted yet)");
-            }
+            }*/
             this.original = original;
         }
 
@@ -78,6 +81,13 @@ public class TaskCopyBuilder {
         public CopyBuilderSteps taskState(TaskState taskState) {
             this.taskState = taskState;
             this.taskStateSet = true;
+            return this;
+        }
+
+        @Override
+        public CopyBuilderSteps setId(String id) {
+            this.id = id;
+            this.idSet = true;
             return this;
         }
 
