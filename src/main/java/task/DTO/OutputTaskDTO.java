@@ -1,4 +1,4 @@
-package task.DTO;
+package task.dto;
 
 public record OutputTaskDTO(
         String id,
