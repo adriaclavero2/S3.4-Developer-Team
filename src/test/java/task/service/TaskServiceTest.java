@@ -49,4 +49,16 @@ public class TaskServiceTest {
 
         verify(repository, times(1)).getById(id); // esto verifica que se llamo al repository
     }
+
+    @Test
+    @DisplayName("You must throw an exception if the task does not exist in the database.")
+    void testGetTaskById_Negative(){
+        String notExistentId = "empty/null/wrong";
+
+        when(repository.getById(notExistentId)).thenReturn(Optional.empty());
+
+        assertThrows(TaskNotFoundException.class, () -> {
+            service.getTaskById(notExistentId);
+        });
+    }
 }
