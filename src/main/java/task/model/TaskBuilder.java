@@ -1,5 +1,6 @@
 package task.model;
 
+import task.model.BuilderSteps.TitleStep;
 import task.model.Task;
 import task.enums.Priority;
 import task.enums.TaskState;
@@ -18,23 +19,6 @@ import java.time.LocalDateTime;
  * - Package-private constructor for Task
  */
 public class TaskBuilder {
-
-    /**
-     * Step 1: Title is mandatory
-     */
-    public interface TitleStep {
-        /**
-         * Sets the task title (required field)
-         * @param title Task title (cannot be null or empty)
-         * @return Next step with optional fields
-         * @throws InvalidTaskTitleException if title is invalid
-         */
-        OptionalSteps title(String title);
-    }
-
-    /**
-     * Step 2+: All optional fields
-     */
     public interface OptionalSteps {
         OptionalSteps description(String description);
         OptionalSteps expireDate(LocalDateTime expireDate);
@@ -57,8 +41,7 @@ public class TaskBuilder {
         private Priority priority = Priority.MEDIUM;
         private TaskState taskState = TaskState.NOT_COMPLETED;
 
-        @Override
-        public OptionalSteps title(String title) {
+        public OptionalSteps withTitle(String title) {
             validateTitle(title);
             this.title = title;
             return this;

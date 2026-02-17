@@ -1,4 +1,7 @@
 package task.model.BuilderSteps;
 
-public interface ContentStep {
+import task.model.TaskBuilder;
+
+public interface DescriptionStep {
+    TaskBuilder.OptionalSteps withDescription(String content);
 }
