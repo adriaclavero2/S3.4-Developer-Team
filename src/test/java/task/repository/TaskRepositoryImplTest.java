@@ -16,8 +16,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TaskRepositoryImplTest {
@@ -49,5 +48,22 @@ public class TaskRepositoryImplTest {
 
         verify(taskDAO).findByID(id);
         verify(mapper).toDomain(mockDoc);
+    }
+
+    @Test
+    @DisplayName("It should return an empty Optional if the DAO finds nothing")
+    void getById_Negative() {
+
+        String id = "id_nonexistent";
+        when(taskDAO.findByID(id)).thenReturn(Optional.empty());
+
+        Optional<Task> result = repository.getById(id);
+
+        assertTrue(result.isEmpty(), "The result should be an empty Optional");
+
+        // VERIFY: ¡Muy importante!
+        // Verificamos que el DAO se llamó, pero el Mapper NO (eficiencia)
+        verify(taskDAO).findByID(id);
+        verifyNoInteractions(mapper);// Si no existe el doc el mapper no se llama en el metodo, entonces con este metodo se verifica que no ha sido llamado
     }
 }
