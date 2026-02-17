@@ -1,6 +1,7 @@
 package task.service;
 
 
+import common.exception.TaskNotFoundException;
 import task.model.Task;
 import task.repository.TaskRepository;
 import task.repository.TaskRepositoryImpl;
@@ -19,5 +20,11 @@ public class TaskService {
         } catch (RuntimeException e) {
             System.err.println(e.getMessage());
         }
+    }
+
+    public Task getTaskById(String id) {
+        return repository.getById(id)
+                .orElseThrow(() -> new TaskNotFoundException(id));
+
     }
 }
