@@ -8,7 +8,6 @@ import task.enums.TaskState;
 
 public class Task {
 
-
     private String id;
     private String title;
     private String description;

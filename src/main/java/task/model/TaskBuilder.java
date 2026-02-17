@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
  */
 public class TaskBuilder {
     public interface OptionalSteps {
-        OptionalSteps description(String description);
         OptionalSteps expireDate(LocalDateTime expireDate);
         OptionalSteps priority(Priority priority);
         OptionalSteps taskState(TaskState taskState);
