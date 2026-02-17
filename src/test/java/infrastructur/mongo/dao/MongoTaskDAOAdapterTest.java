@@ -49,4 +49,16 @@ public class MongoTaskDAOAdapterTest {
         assertTrue(result.isPresent());
         assertEquals("Task 1", result.get().get("title"));
     }
+
+    @Test
+    @DisplayName("It should return Optional.empty if the ID has an invalid format")
+    void findByID_InvalidFormat() {
+
+        String invalidId = "this-is-not-an-object-id";
+
+        Optional<Document> result = dao.findByID(invalidId);
+
+        assertTrue(result.isEmpty());
+        // No hace falta mockear nada porque la excepción salta antes de llegar a la collection
+    }
 }
