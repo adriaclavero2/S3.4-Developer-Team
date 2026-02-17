@@ -1,7 +1,9 @@
 package common.exception;
 
 public class TaskNotFoundException extends RuntimeException {
-  public TaskNotFoundException(String message) {
-    super(message);
-  }
+    public static final String DEFAULT_MESSAGE = "No task was found with the ID: ";
+
+    public TaskNotFoundException(String id) {
+        super(DEFAULT_MESSAGE + id);
+    }
 }
