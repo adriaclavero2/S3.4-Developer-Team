@@ -38,7 +38,8 @@ public class TaskRepositoryImpl implements TaskRepository{
 
     @Override
     public Optional<Task> getById(String id) {
-        return Optional.empty();
+        return taskDAO.findByID(id)
+                .map(doc -> (Task) mapper.toDomain(doc));
     }
 
     @Override
