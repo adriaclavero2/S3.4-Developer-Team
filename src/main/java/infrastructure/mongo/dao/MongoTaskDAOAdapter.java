@@ -77,18 +77,20 @@ public class MongoTaskDAOAdapter implements TaskDAO {
 
     @Override
     public void delete(String id) {
+        DeleteResult deleteResult;
         try {
             Document filter = new Document("_id", new org.bson.types.ObjectId(id));
-            DeleteResult deleteResult = collection.deleteOne(filter);
-
-            if (deleteResult.getDeletedCount() == 0)
-                throw new TaskNotFoundException(id);
+            deleteResult = collection.deleteOne(filter);
 
         } catch (IllegalArgumentException e) {
-            throw new InvalidTaskIDException("MongoDB delete, new document construction raised an error" + e.getMessage());
+            throw new InvalidTaskIDException("MongoDB delete, new document construction raised an error" + e.getMessage(), e);
+
         } catch (MongoException e) {
             throw new DataAccessException("MongoDB delete", e);
         }
+
+        if (deleteResult.getDeletedCount() == 0)
+            throw new TaskNotFoundException(id);
     }
 
     @Override
