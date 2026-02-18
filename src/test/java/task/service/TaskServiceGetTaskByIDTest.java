@@ -7,20 +7,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import task.enums.Priority;
-import task.enums.TaskState;
 import task.model.Task;
 import task.model.TaskBuilder;
 import task.repository.TaskRepository;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class TaskServiceTest {
+public class TaskServiceGetTaskByIDTest {
 
     @Mock
     private TaskRepository repository;
