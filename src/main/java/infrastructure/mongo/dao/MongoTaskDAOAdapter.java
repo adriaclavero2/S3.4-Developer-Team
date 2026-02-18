@@ -2,14 +2,10 @@ package infrastructure.mongo.dao;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
-import infrastructure.mongo.connection.MongoDBConnection;
 import org.bson.Document;
 import task.model.Task;
-import task.model.TaskBuilder;
-import task.model.TaskCopyBuilder;
 
 import java.util.List;
 import java.util.Optional;
