@@ -1,44 +1,29 @@
 package task.model;
 
 import java.time.LocalDateTime;
-import java.util.Formatter;
 
 import task.enums.Priority;
 import task.enums.TaskState;
+import task.model.BuilderSteps.DescriptionStep;
+import task.model.BuilderSteps.OptionalSteps;
+import task.model.BuilderSteps.TitleStep;
 
 public class Task {
-
 
     private String id;
     private String title;
     private String description;
-    private LocalDateTime expireDate;
-    // visibility modifier changed;
     private LocalDateTime creationDate;
+    private LocalDateTime expireDate;
     private Priority priority;
     private TaskState taskState;
 
-    public Task() {
+    protected Task() {
         this.creationDate = LocalDateTime.now();
         this.priority = Priority.MEDIUM;
         this.taskState = TaskState.NOT_COMPLETED;
     }
 
-    public Task(String title) {
-        this();
-        this.title = title;
-    }
-
-    protected Task(String title, String description, LocalDateTime expireDate, Priority priority, TaskState taskState) {
-        this.title = title;
-        this.description = description;
-        this.expireDate = expireDate;
-        this.creationDate = LocalDateTime.now();
-        this.priority = priority;
-        this.taskState = taskState;
-    }
-
-    // Getters and Setters
     public String getId() {
         return id;
     }
@@ -70,7 +55,6 @@ public class Task {
     public TaskState getTaskState() {
         return taskState;
     }
-
 
     public void setTitle(String title) {
         this.title = title;

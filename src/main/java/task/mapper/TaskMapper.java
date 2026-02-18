@@ -31,11 +31,11 @@ public class TaskMapper implements Mapper<Task, Document> {
         ObjectId objID = document.getObjectId("_id");
 
         Task task = TaskBuilder.newTask()
-                .title(document.getString("title"))
-                .description(document.getString("description"))
-                .expireDate(expDate)
-                .taskState(TaskState.valueOf(document.getString("status")))
-                .priority(Priority.valueOf(document.getString("priority")))
+                .withTitle(document.getString("title"))
+                .withDescription(document.getString("description"))
+                .withExpireDate(expDate)
+                .withTaskState(TaskState.valueOf(document.getString("status")))
+                .withPriority(Priority.valueOf(document.getString("priority")))
                 .build();
 
         task.setId(objID.toHexString());

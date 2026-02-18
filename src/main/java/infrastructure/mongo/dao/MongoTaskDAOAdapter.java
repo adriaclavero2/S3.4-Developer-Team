@@ -8,7 +8,6 @@ import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
 import infrastructure.mongo.connection.MongoDBConnection;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import task.model.Task;
 import task.model.TaskBuilder;
 import task.model.TaskCopyBuilder;
@@ -46,16 +45,12 @@ public class MongoTaskDAOAdapter implements TaskDAO {
     @Override
     public Optional<Document> findByID(String id) {
         try {
-            ObjectId objectId = new ObjectId(id);
-            Document doc = collection.find(Filters.eq("_id", objectId)).first();
-            return Optional.ofNullable(doc);
-
-        }catch (IllegalArgumentException e){
+            Document filter = new Document("_id", new org.bson.types.ObjectId(id));
+            Document result = collection.find(filter).first();
+            return Optional.ofNullable(result);
+        } catch(IllegalArgumentException e) {
             return Optional.empty();
-        }catch (MongoException e) {
-            throw new DataAccessException("Error finding document by ID ", e);
         }
-
     }
 
     @Override

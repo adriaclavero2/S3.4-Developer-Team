@@ -39,7 +39,7 @@ public class TaskRepositoryImpl implements TaskRepository{
     @Override
     public Optional<Task> getById(String id) {
         return taskDAO.findByID(id)
-                .map(mapper::toDomain);
+                .map(doc -> (Task) mapper.toDomain(doc));
     }
 
     @Override
@@ -52,6 +52,7 @@ public class TaskRepositoryImpl implements TaskRepository{
         } catch (Exception e) {
             throw new DataAccessException("Error listing tasks: " + e.getMessage());
         }
+        return List.of();
     }
 
     @Override
