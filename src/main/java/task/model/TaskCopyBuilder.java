@@ -94,8 +94,10 @@ public class TaskCopyBuilder {
                 validateExpireDate(finalExpireDate);
             }
 
-            Task copy = new Task(finalTitle, finalDescription, finalExpireDate,
-                    finalPriority, finalTaskState);
+            Task copy = TaskBuilder.newTask()
+                    .withTitle(finalTitle)
+                    .withDescription(finalDescription)
+                            .build();
 
             copy.setId(original.getId());
 
