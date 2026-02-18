@@ -42,7 +42,13 @@ public class MongoTaskDAOAdapter implements TaskDAO {
 
     @Override
     public Optional<Document> findByID(String id) {
-        return Optional.empty();
+        try {
+            Document filter = new Document("_id", new org.bson.types.ObjectId(id));
+            Document result = collection.find(filter).first();
+            return Optional.ofNullable(result);
+        } catch(IllegalArgumentException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
