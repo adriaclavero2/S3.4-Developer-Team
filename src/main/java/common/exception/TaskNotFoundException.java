@@ -8,6 +8,6 @@ public class TaskNotFoundException extends RuntimeException {
     }
 
     public TaskNotFoundException(String id, Throwable cause) {
-        super(id, cause);
+        super(DEFAULT_MESSAGE + id, cause);
     }
 }

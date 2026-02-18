@@ -34,7 +34,7 @@ public class TaskServiceTest {
 
         String id = "69949f595f811f0d2276b457";
 
-        Task mockTask =  TaskBuilder.newTask()
+        Task mockTask = TaskBuilder.newTask()
                 .withTitle("Testing Title")
                 .withDescription("Testing Description")
                 .build();
@@ -52,8 +52,8 @@ public class TaskServiceTest {
     }
 
     @Test
-    @DisplayName("You must throw an exception if the task does not exist in the database.")
-    void testGetTaskById_Negative(){
+    @DisplayName("It must throw an exception if the task does not exist in the database.")
+    void testGetTaskById_Negative() {
         String notExistentId = "empty/null/wrong";
 
         when(repository.getById(notExistentId)).thenReturn(Optional.empty());
@@ -61,5 +61,21 @@ public class TaskServiceTest {
         assertThrows(TaskNotFoundException.class, () -> {
             service.getTaskById(notExistentId);
         });
+    }
+
+    @Test
+    @DisplayName("It should call repository.modify when the task is valid")
+    void testUpdateTask_Positive() {
+        Task mockTask = TaskBuilder.newTask()
+                .withTitle("Testing Title")
+                .withDescription("Testing Description")
+                .build();
+        mockTask.setId("123");
+        // When
+        assertDoesNotThrow(() -> service.updateTask(mockTask));
+
+        // Then
+        verify(repository, times(1)).modify(mockTask);
+
     }
 }
