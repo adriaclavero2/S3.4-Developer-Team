@@ -4,7 +4,6 @@ package task.service;
 import common.exception.TaskNotFoundException;
 import task.model.Task;
 import task.repository.TaskRepository;
-import task.repository.TaskRepositoryImpl;
 
 public class TaskService {
     private final TaskRepository repository;
