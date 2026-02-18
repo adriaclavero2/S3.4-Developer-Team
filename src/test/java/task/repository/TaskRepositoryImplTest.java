@@ -14,8 +14,7 @@ import task.model.TaskBuilder;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,5 +67,29 @@ public class TaskRepositoryImplTest {
         // Verificamos que el DAO se llamó, pero el Mapper NO (eficiencia)
         verify(taskDAO).findByID(id);
         verifyNoInteractions(mapper);// Si no existe el doc el mapper no se llama en el metodo, entonces con este metodo se verifica que no ha sido llamado
+    }
+
+    @Test
+    @DisplayName("It should map the entity to a document and call DAO update")
+    void modify_Positive() {
+        // Given - Usando tu Builder
+        Task mockTask = TaskBuilder.newTask()
+                .withTitle("Testing Title")
+                .withDescription("Testing Description")
+                .build();
+        mockTask.setId("69949f595f811f0d2276b457");
+
+        Document mockDoc = new Document("_id", "69949f595f811f0d2276b457")
+                .append("title", "Testing Title");
+
+        // Configuramos el comportamiento de los colaboradores
+        when(mapper.toDocument(mockTask)).thenReturn(mockDoc);
+
+        // When
+        assertDoesNotThrow(() -> repository.modify(mockTask));
+
+        // Then
+        verify(mapper, times(1)).toDocument(mockTask);
+        verify(taskDAO, times(1)).update(mockDoc);
     }
 }
