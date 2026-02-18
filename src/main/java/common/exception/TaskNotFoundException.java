@@ -7,7 +7,7 @@ public class TaskNotFoundException extends RuntimeException {
         super(DEFAULT_MESSAGE + id);
     }
 
-    public TaskNotFoundException(String message, Throwable cause) {
-        super(message, cause);
+    public TaskNotFoundException(String id, Throwable cause) {
+        super(id, cause);
     }
 }
