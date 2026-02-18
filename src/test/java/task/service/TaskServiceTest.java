@@ -1,5 +1,6 @@
 package task.service;
 
+import common.exception.DataAccessException;
 import common.exception.TaskNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -88,5 +89,28 @@ public class TaskServiceTest {
                 () -> service.updateTask(null));
 
         assertEquals("Task cannot be null", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("It should throw TaskNotFoundException and preserve cause when repository fails")
+    void updateTask_Negative_NotFound() {
+        // Given
+        Task mockTask = TaskBuilder.newTask()
+                .withTitle("Ghost Task")
+                .withDescription("Non-existent task description")
+                .build();
+        mockTask.setId("999");
+
+        // Simulamos que el DAO/Repository lanza la excepción técnica
+        doThrow(new DataAccessException("ID not found"))
+                .when(repository).modify(any(Task.class));
+
+        // When & Then
+        TaskNotFoundException ex = assertThrows(TaskNotFoundException.class,
+                () -> service.updateTask(mockTask));
+
+        // Verificamos congruencia de mensajes y encadenamiento (Stack Trace)
+        assertEquals("No task was found with the ID: 999", ex.getMessage());
+        assertTrue(ex.getCause() instanceof DataAccessException, "The cause should be the original DataAccessException");
     }
 }
