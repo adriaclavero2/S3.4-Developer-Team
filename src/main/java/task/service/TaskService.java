@@ -1,6 +1,7 @@
 package task.service;
 
 
+import common.exception.DataAccessException;
 import common.exception.TaskNotFoundException;
 import task.model.Task;
 import task.repository.TaskRepository;
@@ -28,9 +29,13 @@ public class TaskService {
     }
 
     public void updateTask(Task newTask) {
-        if(newTask == null) {
+        if (newTask == null) {
             throw new IllegalArgumentException("Task cannot be null");
         }
-        repository.modify(newTask);
+        try {
+            repository.modify(newTask);
+        } catch (DataAccessException e) {
+            throw new TaskNotFoundException(newTask.getId(), e);
+        }
     }
 }
