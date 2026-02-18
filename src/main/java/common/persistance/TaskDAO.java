@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface TaskDAO extends GenericDAO<Document, String> {
 
-    List<Task> findCompletedTasks();
+    List<Document> findCompletedTasks();
 }
