@@ -71,7 +71,7 @@ public class TaskServiceTest {
                 .withTitle("Testing Title")
                 .withDescription("Testing Description")
                 .build();
-        mockTask.setId("123");
+        mockTask.setId("69949f595f811f0d2276b457");
         // When
         assertDoesNotThrow(() -> service.updateTask(mockTask));
 
@@ -99,7 +99,7 @@ public class TaskServiceTest {
                 .withTitle("Ghost Task")
                 .withDescription("Non-existent task description")
                 .build();
-        mockTask.setId("999");
+        mockTask.setId("999999999999999999999999");
 
         // Simulamos que el DAO/Repository lanza la excepción técnica
         doThrow(new DataAccessException("ID not found"))

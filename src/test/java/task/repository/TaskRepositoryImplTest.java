@@ -1,5 +1,6 @@
 package task.repository;
 
+import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
 import org.bson.Document;
 import org.junit.jupiter.api.DisplayName;
@@ -91,5 +92,30 @@ public class TaskRepositoryImplTest {
         // Then
         verify(mapper, times(1)).toDocument(mockTask);
         verify(taskDAO, times(1)).update(mockDoc);
+    }
+
+    @Test
+    @DisplayName("It should propagate DataAccessException when the DAO fails")
+    void modify_Negative_DaoFails() {
+        // Given
+        Task mockTask = TaskBuilder.newTask()
+                .withTitle("Failing Task")
+                .withDescription("Testing error_id Description")
+                .build();
+        mockTask.setId("error-id");
+
+        Document mockDoc = new Document("_id", "error-id");
+
+        when(mapper.toDocument(mockTask)).thenReturn(mockDoc);
+
+        // Como el DAO.update es void, usamos doThrow para simular el fallo de red o ID no encontrado
+        doThrow(new DataAccessException("MongoDB connection error"))
+                .when(taskDAO).update(mockDoc);
+
+        // When & Then
+        assertThrows(DataAccessException.class, () -> repository.modify(mockTask));
+
+        // Verificamos que aunque falle el DAO, el mapper sí llegó a trabajar
+        verify(mapper).toDocument(mockTask);
     }
 }

@@ -70,7 +70,7 @@ public class MongoTaskDAOAdapterTest {
     @Test
     @DisplayName("It should complete successfully when the document is updated in MongoDB")
     void update_Positive() {
-        Document doc = new Document("_id", "123").append("title", "Test");
+        Document doc = new Document("_id", "69949f595f811f0d2276b457").append("title", "Test");
         when(collection.updateOne(any(Document.class), any(Document.class))).thenReturn(updateResult);
         when(updateResult.getMatchedCount()).thenReturn(1L);
 
@@ -81,7 +81,7 @@ public class MongoTaskDAOAdapterTest {
     @DisplayName("It should throw DataAccessException when no document matches the provided ID")
     void update_Negative_NotFound() {
         // Given
-        Document doc = new Document("_id", "123");
+        Document doc = new Document("_id", "69949f595f811f0d2276b457");
         when(collection.updateOne(any(Document.class), any(Document.class))).thenReturn(updateResult);
         when(updateResult.getMatchedCount()).thenReturn(0L); // Simulamos que MongoDB no encontró el ID
 
