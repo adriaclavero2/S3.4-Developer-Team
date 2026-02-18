@@ -2,6 +2,8 @@ package infrastructur.mongo.dao;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.result.UpdateResult;
+import common.exception.DataAccessException;
 import infrastructure.mongo.dao.MongoTaskDAOAdapter;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -14,8 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +28,9 @@ public class MongoTaskDAOAdapterTest {
 
     @Mock
     private FindIterable<Document> findIterable; // Necesario para el .find(). Se crea porque es el puntero que punta al inicio de un bloque de memoria con resultados
+
+    @Mock
+    private UpdateResult updateResult;
 
     @InjectMocks
     private MongoTaskDAOAdapter dao;
@@ -62,4 +66,15 @@ public class MongoTaskDAOAdapterTest {
         assertTrue(result.isEmpty());
         // No hace falta mockear nada porque la excepción salta antes de llegar a la collection
     }
+
+    @Test
+    @DisplayName("It should complete successfully when the document is updated in MongoDB")
+    void update_Positive() {
+        Document doc = new Document("_id", "123").append("title", "Test");
+        when(collection.updateOne(any(Document.class), any(Document.class))).thenReturn(updateResult);
+        when(updateResult.getMatchedCount()).thenReturn(1L);
+
+        assertDoesNotThrow(() -> dao.update(doc));
+    }
+
 }
