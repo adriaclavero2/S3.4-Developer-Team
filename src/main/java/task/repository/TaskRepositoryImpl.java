@@ -15,11 +15,6 @@ public class TaskRepositoryImpl implements TaskRepository{
     private final TaskDAO taskDAO;
     private final Mapper<Task,Document> mapper;
 
-    public TaskRepositoryImpl() {
-        this.taskDAO = new MongoTaskDAOAdapter();
-        this.mapper = new TaskMapper();
-    }
-
     public TaskRepositoryImpl(TaskDAO taskDAO, Mapper<Task,Document> mapper) {
         this.taskDAO = taskDAO;
         this.mapper = mapper;
