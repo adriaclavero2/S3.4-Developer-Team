@@ -78,4 +78,15 @@ public class TaskServiceTest {
         verify(repository, times(1)).modify(mockTask);
 
     }
+
+    @Test
+    @DisplayName("It should throw IllegalArgumentException when the input task is null")
+    void testUpdateTask_Negative_NullTask() {
+        // When & Then
+        // Aquí no usamos builder porque precisamente probamos el caso null
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> service.updateTask(null));
+
+        assertEquals("Task cannot be null", ex.getMessage());
+    }
 }
