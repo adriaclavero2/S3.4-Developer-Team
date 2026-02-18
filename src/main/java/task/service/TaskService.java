@@ -35,4 +35,8 @@ public class TaskService {
                 .orElseThrow(() -> new TaskNotFoundException(id));
 
     }
+
+    public void removeTask(String id) {
+
+    }
 }
