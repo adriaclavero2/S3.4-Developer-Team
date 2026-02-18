@@ -1,6 +1,8 @@
 package task.service;
 
 
+import common.exception.DataAccessException;
+import common.exception.InvalidTaskIDException;
 import common.exception.TaskNotFoundException;
 import task.model.Task;
 import task.repository.TaskRepository;
@@ -27,11 +29,17 @@ public class TaskService {
 
     }
 
-    public void removeTask(String id) {
+    public String removeTask(String id) {
         try {
             repository.remove(id);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            return "Task (" + id + ") successfully deleted.";
+
+        } catch (TaskNotFoundException e) {
+            return "Task (" + id + ") does not exist.";
+        } catch (InvalidTaskIDException e) {
+            return "Invalid id format.";
+        } catch (DataAccessException e) {
+            return "Error raised during task deletion. Try again.";
         }
     }
 }
