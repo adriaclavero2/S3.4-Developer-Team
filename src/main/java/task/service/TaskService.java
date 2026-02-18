@@ -26,4 +26,11 @@ public class TaskService {
                 .orElseThrow(() -> new TaskNotFoundException(id));
 
     }
+
+    public void updateTask(Task newTask) {
+        if(newTask == null) {
+            throw new IllegalArgumentException("Task cannot be null");
+        }
+        repository.modify(newTask);
+    }
 }
