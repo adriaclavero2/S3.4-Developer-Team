@@ -19,9 +19,9 @@ public class MongoTaskDAOAdapter implements TaskDAO {
 
     private final MongoCollection<Document> collection;
 
-    public MongoTaskDAOAdapter() {
-        MongoDatabase database = MongoDBConnection.getDatabase();
-        this.collection = database.getCollection("tasks");
+    public MongoTaskDAOAdapter(MongoCollection<Document> collection) {
+       // MongoDatabase database = MongoDBConnection.getDatabase();
+        this.collection = collection;
     }
 
     @Override
