@@ -38,18 +38,20 @@ public class TaskRepositoryImpl implements TaskRepository{
 
     @Override
     public Optional<Task> getById(String id) {
-        return Optional.empty();
+        return taskDAO.findByID(id)
+                .map(mapper::toDomain);
     }
 
     @Override
     public List<Task> getAll() {
         try {
-            taskDAO.findAll();
-            System.out.println("Log: task list all successfully");
-        } catch (DataAccessException e) {
-            throw new DataAccessException("MongoDB", e);
+            List<Document> documents = taskDAO.findAll();
+            return documents.stream()
+                    .map(doc -> mapper.toDomain(doc))
+                    .toList();
+        } catch (Exception e) {
+            throw new DataAccessException("Error listing tasks: " + e.getMessage());
         }
-        return List.of();
     }
 
     @Override
