@@ -3,9 +3,7 @@ package task.repository;
 import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
 import common.utils.Mapper;
-import infrastructure.mongo.dao.MongoTaskDAOAdapter;
 import org.bson.Document;
-import task.mapper.TaskMapper;
 import task.model.Task;
 
 import java.util.List;
