@@ -2,6 +2,7 @@ package infrastructure.mongo.dao;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.result.UpdateResult;
 import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
 import org.bson.Document;
@@ -57,7 +58,7 @@ public class MongoTaskDAOAdapter implements TaskDAO {
         try {
             Object idValue = doc.get("_id");
             if (idValue == null) {
-                throw new IllegalArgumentException("The document must have a -id to be update");
+                throw new IllegalArgumentException("The document must have a _id to be update");
             }
 
             Document filter = new Document("_id", idValue);
@@ -65,9 +66,18 @@ public class MongoTaskDAOAdapter implements TaskDAO {
             Document docToUpdate = new Document(doc);
             docToUpdate.remove("_id");
 
-            collection.updateOne(filter, new Document("$set", docToUpdate)); /*Metodo de Mongo para update. En new Document "$set" lo va a interpretar como la funcion set de mongo y modifica el elemento en el server. las key que comienzan con $ se interpretan como operadores de accion*/
+            UpdateResult result = collection.updateOne(filter, new Document("$set", docToUpdate)); /*Metodo de Mongo para update. En new Document "$set" lo va a interpretar como la funcion set de mongo y modifica el elemento en el server. las key que comienzan con $ se interpretan como operadores de accion*/
+
+            if(result.getMatchedCount() == 0) {
+                throw new DataAccessException("Task with _id " + idValue + " not found.");
+            }
+            System.out.println("Log: Document updated in MongoDB");
+
+        } catch (DataAccessException e) {
+            // Si es nuestra propia excepción de "no encontrado", la relanzamos tal cual
+            throw e;
         } catch (Exception e) {
-            throw new DataAccessException("MongoDB update", e);
+            throw new DataAccessException("MongoDB update error ", e);
         }
 
     }
