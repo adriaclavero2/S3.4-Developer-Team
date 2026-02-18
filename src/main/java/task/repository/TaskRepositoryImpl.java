@@ -48,13 +48,10 @@ public class TaskRepositoryImpl implements TaskRepository{
 
     @Override
     public void modify(Task entity) {
-        try {
+
             Document doc = mapper.toDocument(entity);
             taskDAO.update(doc);
             System.out.println("Log: task updated successfully");
-        } catch (DataAccessException e) {
-            throw new DataAccessException("Error modifying task: " + e.getMessage(), e);
-        }
 
     }
 
