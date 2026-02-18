@@ -18,8 +18,8 @@ class TaskMapperTest {
     @Test
     public void toDocumentTest() {
         Task task = TaskBuilder.newTask()
-                .title("Study")
-                .description("study design patterns")
+                .withTitle("Study")
+                .withDescription("study design patterns")
                 .build();
 
         Document doc = taskMapper.toDocument(task);

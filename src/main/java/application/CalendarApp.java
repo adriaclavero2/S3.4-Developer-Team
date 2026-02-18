@@ -49,7 +49,8 @@ public class CalendarApp {
             }
 
             Task newTask = TaskBuilder.newTask()
-                .title("Comprar el pan")
+                .withTitle("Comprar el pan")
+                .withDescription("Comprar dos baguette y dos catalanas")
                 .build();
 
             taskService.createTask(newTask);
@@ -60,7 +61,5 @@ public class CalendarApp {
             //Cerramos la conexion al terminar
             MongoDBConnection.close();
         }
-
-
     }
 }
