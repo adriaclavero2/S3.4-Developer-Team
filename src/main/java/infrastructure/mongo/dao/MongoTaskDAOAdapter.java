@@ -3,14 +3,17 @@ package infrastructure.mongo.dao;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
 import infrastructure.mongo.connection.MongoDBConnection;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import task.model.Task;
 import task.model.TaskBuilder;
 import task.model.TaskCopyBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,12 +45,26 @@ public class MongoTaskDAOAdapter implements TaskDAO {
 
     @Override
     public Optional<Document> findByID(String id) {
-        return Optional.empty();
+        try {
+            ObjectId objectId = new ObjectId(id);
+            Document doc = collection.find(Filters.eq("_id", objectId)).first();
+            return Optional.ofNullable(doc);
+
+        }catch (IllegalArgumentException e){
+            return Optional.empty();
+        }catch (MongoException e) {
+            throw new DataAccessException("Error finding document by ID ", e);
+        }
+
     }
 
     @Override
     public List<Document> findAll() {
-        return List.of();
+        try{
+            return collection.find().into(new ArrayList<>());
+        } catch (MongoException e) {
+            throw new DataAccessException("Error listing all documents", e);
+        }
     }
 
     @Override
@@ -80,7 +97,12 @@ public class MongoTaskDAOAdapter implements TaskDAO {
     }
 
     @Override
-    public List<Task> findCompletedTasks() {
-        return List.of();
+    public List<Document> findCompletedTasks() {
+        try{
+            return collection.find(Filters.eq("status", "COMPLETED"))
+                    .into(new ArrayList<>());
+        }catch (MongoException e) {
+            throw new DataAccessException("Error finding completed tasks", e);
+        }
     }
 }
