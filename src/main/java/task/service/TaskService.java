@@ -37,6 +37,10 @@ public class TaskService {
     }
 
     public void removeTask(String id) {
-
+        try {
+            repository.remove(id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
