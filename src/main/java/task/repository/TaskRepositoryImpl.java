@@ -53,7 +53,7 @@ public class TaskRepositoryImpl implements TaskRepository{
             taskDAO.update(doc);
             System.out.println("Log: task updated successfully");
         } catch (DataAccessException e) {
-            throw new DataAccessException("Error modifying task: " + e.getMessage());
+            throw new DataAccessException("Error modifying task: " + e.getMessage(), e);
         }
 
     }
