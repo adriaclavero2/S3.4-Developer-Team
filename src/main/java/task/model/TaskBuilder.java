@@ -1,5 +1,7 @@
 package task.model;
 
+import common.exception.InvalidTaskDescriptionException;
+import task.model.BuilderSteps.*;
 import task.model.Task;
 import task.enums.Priority;
 import task.enums.TaskState;
@@ -7,100 +9,167 @@ import common.exception.InvalidTaskTitleException;
 import common.exception.TaskExpireDateInPastException;
 import java.time.LocalDateTime;
 
-/**
- * TaskBuilder - External Builder for Task entity
- *
- * Features:
- * - Step Builder pattern with interfaces
- * - Validates all business rules
- * - Applies default values
- * - Throws semantic exceptions
- * - Package-private constructor for Task
- */
 public class TaskBuilder {
 
-    /**
-     * Step 1: Title is mandatory
-     */
-    public interface TitleStep {
-        /**
-         * Sets the task title (required field)
-         * @param title Task title (cannot be null or empty)
-         * @return Next step with optional fields
-         * @throws InvalidTaskTitleException if title is invalid
-         */
-        OptionalSteps title(String title);
+    public static TitleStep newTask() {
+        return new Builder();
     }
 
-    /**
-     * Step 2+: All optional fields
-     */
-    public interface OptionalSteps {
-        OptionalSteps description(String description);
-        OptionalSteps expireDate(LocalDateTime expireDate);
-        OptionalSteps priority(Priority priority);
-        OptionalSteps taskState(TaskState taskState);
-        Task build();
-    }
+    private static class Builder implements TitleStep {
+        private Task newTask;
 
-    /**
-     * Builder implementation
-     */
-    private static class Builder implements TitleStep, OptionalSteps {
+        private Builder() {
+            this.newTask = new Task();
+        }
 
-        // Required field
-        private String title;
-
-        // Optional fields with defaults
-        private String description = null;
-        private LocalDateTime expireDate = null;
-        private Priority priority = Priority.MEDIUM;
-        private TaskState taskState = TaskState.NOT_COMPLETED;
-
-        @Override
-        public OptionalSteps title(String title) {
+        public DescriptionStep withTitle(String title) {
             validateTitle(title);
-            this.title = title;
-            return this;
+            this.newTask.setTitle(title);
+            return new DescriptionStepImpl();
         }
 
-        @Override
-        public OptionalSteps description(String description) {
-            this.description = description;
-            return this;
+        private class DescriptionStepImpl implements DescriptionStep {
+            @Override
+            public OptionalSteps withDescription(String description) {
+                validateDescription(description);
+                newTask.setDescription(description);
+                return new OptionalStepsImpl();
+            }
         }
 
-        @Override
-        public OptionalSteps expireDate(LocalDateTime expireDate) {
-            validateExpireDate(expireDate);
-            this.expireDate = expireDate;
-            return this;
-        }
-
-        @Override
-        public OptionalSteps priority(Priority priority) {
-            this.priority = priority != null ? priority : Priority.MEDIUM;
-            return this;
-        }
-
-        @Override
-        public OptionalSteps taskState(TaskState taskState) {
-            this.taskState = taskState != null ? taskState : TaskState.NOT_COMPLETED;
-            return this;
-        }
-
-        @Override
-        public Task build() {
-            // Final validation before creating
-            validateTitle(title);
-            if (expireDate != null) {
-                validateExpireDate(expireDate);
+        private class OptionalStepsImpl implements OptionalSteps {
+            @Override
+            public TaskStateExpDateStep withPriority(Priority priority) {
+                newTask.setPriority(priority);
+                return new TaskStateExpDateStepImpl();
             }
 
-            return new Task(title, description, expireDate, priority, taskState);
+            @Override
+            public PriorityTaskStateStep withExpireDate(LocalDateTime date) {
+                validateExpireDate(date);
+                newTask.setExpireDate(date);
+                return new PriorityTaskStateImpl();
+            }
+
+            @Override
+            public PriorityExpDateStep withTaskState(TaskState taskState) {
+                newTask.setTaskState(taskState);
+                return new PriorityExpDateImpl();
+            }
+
+            @Override
+            public Task build() {
+                return newTask;
+            }
         }
 
-        // ========== VALIDATIONS ==========
+        private class TaskStateExpDateStepImpl implements TaskStateExpDateStep {
+            @Override
+            public TaskStateStep withExpireDate(LocalDateTime date) {
+                validateExpireDate(date);
+                newTask.setExpireDate(date);
+                return new TaskStateStepImpl();
+            }
+
+            @Override
+            public ExpireDateStep withTaskState(TaskState taskState) {
+                newTask.setTaskState(taskState);
+                return new ExpireDateImpl();
+            }
+
+            @Override
+            public Task build() {
+                return newTask;
+            }
+        }
+
+        private class PriorityTaskStateImpl implements PriorityTaskStateStep {
+            @Override
+            public TaskStateStep withPriority(Priority priority) {
+                newTask.setPriority(priority);
+                return new TaskStateStepImpl();
+            }
+
+            @Override
+            public PriorityStep withTaskState(TaskState taskState) {
+                newTask.setTaskState(taskState);
+                return new PriorityStepImpl();
+            }
+
+            @Override
+            public Task build() {
+                return newTask;
+            }
+        }
+
+        private class PriorityExpDateImpl implements PriorityExpDateStep {
+            @Override
+            public PriorityStep withExpireDate(LocalDateTime date) {
+                validateExpireDate(date);
+                newTask.setExpireDate(date);
+                return new PriorityStepImpl();
+            }
+
+            @Override
+            public ExpireDateStep withPriority(Priority priority) {
+                newTask.setPriority(priority);
+                return new ExpireDateImpl();
+            }
+
+            @Override
+            public Task build() {
+                return newTask;
+            }
+        }
+
+        private class TaskStateStepImpl implements TaskStateStep {
+            @Override
+            public BuildStep withTaskState(TaskState taskState) {
+                newTask.setTaskState(taskState);
+                return new BuildStepImpl();
+            }
+
+            @Override
+            public Task build() {
+                return newTask;
+            }
+        }
+
+        private class PriorityStepImpl implements PriorityStep {
+            @Override
+            public BuildStep withPriority(Priority priority) {
+                newTask.setPriority(priority);
+                return new BuildStepImpl();
+            }
+
+            @Override
+            public Task build() {
+                return newTask;
+            }
+        }
+
+        private class ExpireDateImpl implements ExpireDateStep {
+            @Override
+            public BuildStep withExpireDate(LocalDateTime date) {
+                validateExpireDate(date);
+                newTask.setExpireDate(date);
+                return new BuildStepImpl();
+            }
+
+            @Override
+            public Task build() {
+                return newTask;
+            }
+        }
+
+        private class BuildStepImpl implements BuildStep {
+            @Override
+            public Task build() {
+                return newTask;
+            }
+        }
+
+        // ================ VALIDATION PRIVATE METHODS ====================
 
         private void validateTitle(String title) {
             if (title == null) {
@@ -114,6 +183,15 @@ public class TaskBuilder {
             }
         }
 
+        private void validateDescription(String description) {
+            if (description == null) {
+                throw new InvalidTaskDescriptionException(InvalidTaskDescriptionException.NULL_DESCRIPTION_ERROR);
+            }
+            if (description.trim().isEmpty()) {
+                throw new InvalidTaskDescriptionException(InvalidTaskDescriptionException.EMPTY_DESCRIPTION_ERROR);
+            }
+        }
+
         private void validateExpireDate(LocalDateTime expireDate) {
             if (expireDate != null && expireDate.isBefore(LocalDateTime.now())) {
                 throw new TaskExpireDateInPastException(
@@ -121,13 +199,5 @@ public class TaskBuilder {
                 );
             }
         }
-    }
-
-    /**
-     * Entry point to create a new Task
-     * @return TitleStep forcing user to provide title first
-     */
-    public static TitleStep newTask() {
-        return new Builder();
     }
 }

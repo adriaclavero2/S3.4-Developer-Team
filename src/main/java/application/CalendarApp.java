@@ -28,7 +28,8 @@ public class CalendarApp {
         }
 
         Task newTask = TaskBuilder.newTask()
-                .title("Comprar el pan")
+                .withTitle("Comprar el pan")
+                .withDescription("Comprar dos baguette y dos catalanas")
                 .build();
 
         TaskService taskService = new TaskService();
