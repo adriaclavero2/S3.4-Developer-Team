@@ -35,8 +35,11 @@ public class TaskRepositoryImplTest {
     void getById_Positive() {
 
         String id = "69949f595f811f0d2276b457";
-        Document mockDoc = new Document("_id", id).append("title", "Test Task");
-        Task mockTask = TaskBuilder.newTask().title("Test Task").build();
+        Document mockDoc = new Document("_id", id).append("title", "Test Task").append("description", "Test description");
+        Task mockTask = TaskBuilder.newTask()
+                .withTitle("Test Task")
+                .withDescription("Test description")
+                .build();
 
         when(taskDAO.findByID(id)).thenReturn(Optional.of(mockDoc));
         when(mapper.toDomain(mockDoc)).thenReturn(mockTask);
