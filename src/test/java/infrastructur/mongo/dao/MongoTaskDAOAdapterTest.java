@@ -36,7 +36,7 @@ public class MongoTaskDAOAdapterTest {
     void findByID_Positive() {
 
         String validId = "69949f595f811f0d2276b457";
-        Document mockDoc = new Document("_id", new ObjectId(validId)).append("title", "Task 1");
+        Document mockDoc = new Document("_id", new ObjectId(validId)).append("title", "Task 1").append("description", "Test description");
 
         // Mockeamos la cadena fluida: collection.find(filter).first()
         //Le decimos: "Cuando llamen a find, devuelve nuestro impostor findIterable"
@@ -48,6 +48,7 @@ public class MongoTaskDAOAdapterTest {
 
         assertTrue(result.isPresent());
         assertEquals("Task 1", result.get().get("title"));
+        assertEquals("Test description", result.get().get("description"));
     }
 
     @Test
