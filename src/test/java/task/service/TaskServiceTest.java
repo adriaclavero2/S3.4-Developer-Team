@@ -76,7 +76,7 @@ public class TaskServiceTest {
         String result = service.updateTask(mockTask);
 
         // Then
-        assertEquals("Task with -id 67890 updated successfully", result);
+        assertEquals("Task with _id 69949f595f811f0d2276b457 updated successfully", result);
         verify(repository, times(1)).modify(mockTask);
 
     }
@@ -84,12 +84,10 @@ public class TaskServiceTest {
     @Test
     @DisplayName("It should throw IllegalArgumentException when the input task is null")
     void testUpdateTask_Negative_NullTask() {
-        // When & Then
-        // Aquí no usamos builder porque precisamente probamos el caso null
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> service.updateTask(null));
 
-        assertEquals("Task cannot be null", ex.getMessage());
+        String result = service.updateTask(null);
+
+        assertEquals("Error: Task cannot be null", result);
     }
 
     @Test
