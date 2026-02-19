@@ -55,9 +55,8 @@ public class MongoTaskDAOAdapter implements TaskDAO {
 
     @Override
     public void update(Document doc) {
+        Object idValue = doc.get("_id");
         try {
-            Object idValue = doc.get("_id");
-
             Document filter = new Document("_id", idValue);
             Document docToUpdate = new Document(doc);
             docToUpdate.remove("_id");
