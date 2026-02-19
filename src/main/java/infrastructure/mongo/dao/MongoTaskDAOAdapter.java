@@ -8,6 +8,7 @@ import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import task.enums.TaskState;
 import task.model.Task;
 
 import java.util.ArrayList;
@@ -91,7 +92,8 @@ public class MongoTaskDAOAdapter implements TaskDAO {
     public List<Document> findCompletedTasks() {
         try {
             // Filtramos por el campo que indique que está completada
-            Bson filter = Filters.eq("status", "COMPLETED");
+            String statusValue = TaskState.COMPLETED.name();
+            Bson filter = Filters.eq("status", statusValue);
             return collection.find(filter).into(new ArrayList<>());
         } catch (Exception e) {
             throw new DataAccessException("Error retrieving completed tasks from MongoDB", e);
