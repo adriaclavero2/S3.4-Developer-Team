@@ -110,4 +110,22 @@ public class TaskServiceTest {
         // Verificamos congruencia de mensajes y encadenamiento (Stack Trace)
         assertTrue(result.contains("Persistence error: ID not found"));
     }
+
+    @Test
+    @DisplayName("It should return error message when the task has no ID")
+    void testUpdateTask_Negative_NoId() {
+        // Given: Una tarea construida pero sin setearle el ID
+        Task taskWithoutId = TaskBuilder.newTask()
+                .withTitle("No ID Task")
+                .withDescription("Non-existent task description")
+                .build();
+
+        // When
+        String result = service.updateTask(taskWithoutId);
+
+        // Then
+        assertEquals("Error: Cannot update a task without an ID", result);
+        // Verificamos que NI SIQUIERA se intentó llamar al repositorio
+        verify(repository, never()).modify(any());
+    }
 }
