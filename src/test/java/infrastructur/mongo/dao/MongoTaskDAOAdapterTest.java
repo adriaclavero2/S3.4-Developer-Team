@@ -78,5 +78,21 @@ public class MongoTaskDAOAdapterTest {
         verify(collection, times(1)).updateOne(any(Document.class), any(Document.class));
     }
 
+    @Test
+    @DisplayName("It should throw DataAccessException when no document matches the provided ID")
+    void update_IdNotFound_ThrowsDataAccessException() {
+        // Given
+        String id = "69949f595f811f0d2276b457";
+        Document doc = new Document("_id", id);
+        when(collection.updateOne(any(Document.class), any(Document.class))).thenReturn(updateResult);
+        when(updateResult.getMatchedCount()).thenReturn(0L); // Simulamos que MongoDB no encontró el ID
+
+        // When & Then
+        DataAccessException ex = assertThrows(DataAccessException.class, () -> dao.update(doc));
+
+        // Verificamos que el mensaje de error sea el esperado
+        assertTrue(ex.getMessage().contains("Task with _id " + id + " not found."));
+    }
+
 
 }
