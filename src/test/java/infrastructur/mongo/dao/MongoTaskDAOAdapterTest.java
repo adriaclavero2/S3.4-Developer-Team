@@ -94,5 +94,20 @@ public class MongoTaskDAOAdapterTest {
         assertTrue(ex.getMessage().contains("Task with _id " + id + " not found."));
     }
 
+    @Test
+    @DisplayName("It should throw DataAccessException when a technical database error occurs")
+    void update_MongoDbError_ThrowsDataAccessException() {
+        // Given
+        Document doc = new Document("_id", "123");
+        // Simulamos un error interno de MongoDB (ej. timeout o pérdida de conexión)
+        when(collection.updateOne(any(Document.class), any(Document.class)))
+                .thenThrow(new RuntimeException("Connection lost"));
+
+        // When & Then
+        DataAccessException ex = assertThrows(DataAccessException.class, () -> dao.update(doc));
+
+        assertTrue(ex.getMessage().contains("MongoDB update error"));
+        assertTrue(ex.getCause() instanceof RuntimeException);
+    }
 
 }
