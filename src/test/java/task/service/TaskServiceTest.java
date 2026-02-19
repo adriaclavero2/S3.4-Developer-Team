@@ -15,6 +15,7 @@ import task.model.TaskBuilder;
 import task.repository.TaskRepository;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -166,5 +167,18 @@ public class TaskServiceTest {
 
         assertTrue(result.contains("Testing Title"));
         verify(repository, times(1)).getCompletedTasks();
+    }
+
+    @Test
+    @DisplayName("It should return an informative message when no completed tasks are found")
+    void listCompletedTasks_NoTasks_ReturnsEmptyListMessage() {
+        // Given
+        when(repository.getCompletedTasks()).thenReturn(Collections.emptyList());
+
+        // When
+        String result = service.listCompletedTasks();
+
+        // Then
+        assertEquals("No tasks completed", result);
     }
 }
