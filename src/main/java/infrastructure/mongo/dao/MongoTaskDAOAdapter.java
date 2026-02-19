@@ -57,12 +57,8 @@ public class MongoTaskDAOAdapter implements TaskDAO {
     public void update(Document doc) {
         try {
             Object idValue = doc.get("_id");
-            if (idValue == null) {
-                throw new IllegalArgumentException("The document must have a _id to be update");
-            }
 
             Document filter = new Document("_id", idValue);
-
             Document docToUpdate = new Document(doc);
             docToUpdate.remove("_id");
 
@@ -71,8 +67,6 @@ public class MongoTaskDAOAdapter implements TaskDAO {
             if(result.getMatchedCount() == 0) {
                 throw new DataAccessException("Task with _id " + idValue + " not found.");
             }
-            System.out.println("Log: Document updated in MongoDB");
-
         } catch (DataAccessException e) {
             // Si es nuestra propia excepción de "no encontrado", la relanzamos tal cual
             throw e;
