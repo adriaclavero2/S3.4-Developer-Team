@@ -6,6 +6,8 @@ import common.exception.TaskNotFoundException;
 import task.model.Task;
 import task.repository.TaskRepository;
 
+import java.util.List;
+
 public class TaskService {
     private final TaskRepository repository;
 
@@ -44,4 +46,31 @@ public class TaskService {
             return "Unexpected error: " + e.getMessage();
         }
     }
+
+    public String listCompletedTasks() {
+        try {
+            List<Task> completedTasks = repository.getCompletedTasks();
+
+            if (completedTasks.isEmpty()) {
+                return "No tasks completed";
+            }
+
+            StringBuilder sb = new StringBuilder("--- COMPLETED TASKS ---\n");
+            for (Task task : completedTasks) {
+                sb.append(String.format("- %s: %s (Created: %s, Finished: %s)\n",
+                        task.getTitle(),
+                        task.getDescription(),
+                        task.getCreationDate(),
+                        task.getExpireDate()));
+            }
+            return sb.toString();
+
+        } catch (DataAccessException e) {
+            return "Persistence error: " + e.getMessage();
+        } catch (Exception e) {
+            return "Unexpected error: " + e.getMessage();
+        }
+    }
+
+
 }
