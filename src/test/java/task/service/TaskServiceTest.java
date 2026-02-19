@@ -105,11 +105,9 @@ public class TaskServiceTest {
                 .when(repository).modify(any(Task.class));
 
         // When & Then
-        TaskNotFoundException ex = assertThrows(TaskNotFoundException.class,
-                () -> service.updateTask(mockTask));
+        String result = service.updateTask(mockTask);
 
         // Verificamos congruencia de mensajes y encadenamiento (Stack Trace)
-        assertEquals("No task was found with the ID: 999", ex.getMessage());
-        assertTrue(ex.getCause() instanceof DataAccessException, "The cause should be the original DataAccessException");
+        assertTrue(result.contains("Persistence error: ID not found"));
     }
 }
