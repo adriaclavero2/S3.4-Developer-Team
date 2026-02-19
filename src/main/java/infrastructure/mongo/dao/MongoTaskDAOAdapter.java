@@ -2,12 +2,15 @@ package infrastructure.mongo.dao;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.UpdateResult;
 import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import task.model.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,7 +88,13 @@ public class MongoTaskDAOAdapter implements TaskDAO {
     }
 
     @Override
-    public List<Task> findCompletedTasks() {
-        return List.of();
+    public List<Document> findCompletedTasks() {
+        try {
+            // Filtramos por el campo que indique que está completada
+            Bson filter = Filters.eq("status", "COMPLETED");
+            return collection.find(filter).into(new ArrayList<>());
+        } catch (Exception e) {
+            throw new DataAccessException("Error retrieving completed tasks from MongoDB", e);
+        }
     }
 }
