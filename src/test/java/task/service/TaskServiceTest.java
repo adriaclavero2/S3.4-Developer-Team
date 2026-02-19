@@ -73,9 +73,10 @@ public class TaskServiceTest {
                 .build();
         mockTask.setId("69949f595f811f0d2276b457");
         // When
-        assertDoesNotThrow(() -> service.updateTask(mockTask));
+        String result = service.updateTask(mockTask);
 
         // Then
+        assertEquals("Task with -id 67890 updated successfully", result);
         verify(repository, times(1)).modify(mockTask);
 
     }

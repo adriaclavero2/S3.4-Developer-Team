@@ -37,7 +37,7 @@ public class TaskService {
         }
         try {
             repository.modify(newTask);
-            return "Task with -id " + newTask.getId() + " updated successfully";
+            return "Task with _id " + newTask.getId() + " updated successfully";
         } catch (DataAccessException e) {
             return "Persistence error: " + e.getMessage();
         } catch (Exception e) {
