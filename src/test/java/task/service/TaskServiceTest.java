@@ -15,6 +15,7 @@ import task.model.TaskBuilder;
 import task.repository.TaskRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -148,5 +149,22 @@ public class TaskServiceTest {
 
         // Then
         assertTrue(result.contains("Unexpected error: Fatal system crash"));
+    }
+
+    @Test
+    @DisplayName("It should return a formatted list when completed tasks exist")
+    void listCompletedTasks_TasksExist_ReturnsFormattedString() {
+
+        Task task = TaskBuilder.newTask()
+                .withTitle("Testing Title")
+                .withDescription("Testing Description")
+                .build();
+
+        when(repository.getCompletedTasks()).thenReturn(List.of(task));
+
+        String result = service.listCompletedTasks();
+
+        assertTrue(result.contains("Testing Title"));
+        verify(repository, times(1)).getCompletedTasks();
     }
 }
