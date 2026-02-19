@@ -66,7 +66,7 @@ public class TaskServiceTest {
 
     @Test
     @DisplayName("It should call repository.modify when the task is valid")
-    void testUpdateTask_Positive() {
+    void updateTask_ValidTaskWithId_ReturnsSuccessMessage() {
         Task mockTask = TaskBuilder.newTask()
                 .withTitle("Testing Title")
                 .withDescription("Testing Description")
@@ -83,7 +83,7 @@ public class TaskServiceTest {
 
     @Test
     @DisplayName("It should throw IllegalArgumentException when the input task is null")
-    void testUpdateTask_Negative_NullTask() {
+    void updateTask_NullTask_ReturnsErrorMessage() {
 
         String result = service.updateTask(null);
 
@@ -92,7 +92,7 @@ public class TaskServiceTest {
 
     @Test
     @DisplayName("It should throw TaskNotFoundException and preserve cause when repository fails")
-    void updateTask_Negative_NotFound() {
+    void updateTask_IdNotFoundInRepository_ReturnsPersistenceErrorMessage() {
         // Given
         Task mockTask = TaskBuilder.newTask()
                 .withTitle("Ghost Task")
@@ -113,7 +113,7 @@ public class TaskServiceTest {
 
     @Test
     @DisplayName("It should return error message when the task has no ID")
-    void testUpdateTask_Negative_NoId() {
+    void updateTask_MissingId_ReturnsErrorMessage() {
         // Given: Una tarea construida pero sin setearle el ID
         Task taskWithoutId = TaskBuilder.newTask()
                 .withTitle("No ID Task")
@@ -131,7 +131,7 @@ public class TaskServiceTest {
 
     @Test
     @DisplayName("It should return unexpected error message for non-data exceptions")
-    void testUpdateTask_Negative_UnexpectedException() {
+    void updateTask_UnexpectedException_ReturnsGeneralErrorMessage() {
         // Given
         Task mockTask = TaskBuilder.newTask()
                 .withTitle("Testing Title")
