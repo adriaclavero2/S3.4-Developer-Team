@@ -14,12 +14,21 @@ public class TaskService {
         this.repository = repository;
     }
 
-    public void createTask(Task newTask) {
+    public String createTask(Task newTask) {
+
+        if(newTask == null){
+            throw new IllegalArgumentException("CreateTask: Task cannot be null");
+            // or return "Provide a task to create";
+        }
+
         try {
             repository.create(newTask);
-            System.out.println("New task " + newTask.getTitle() + " created");
-        } catch (RuntimeException e) {
-            System.err.println(e.getMessage());
+            return "New task " + newTask.getTitle() + " created";
+
+        } catch (IllegalArgumentException e) {
+            return "Something go wrong with data format";
+        } catch (DataAccessException e) {
+            return "Error raised during task creation. Try again.";
         }
     }
 
