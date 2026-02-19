@@ -126,4 +126,13 @@ public class MongoTaskDAOAdapterTest {
         assertEquals("Done", result.get(0).get("title"));
     }
 
+    @Test
+    @DisplayName("It should throw DataAccessException when a technical database error occurs")
+    void findCompleted_MongoError_ThrowsDataAccessException() {
+
+        when(collection.find(any(Bson.class))).thenThrow(new RuntimeException("Connection error"));
+
+        assertThrows(DataAccessException.class, () -> dao.findCompletedTasks());
+    }
+
 }
