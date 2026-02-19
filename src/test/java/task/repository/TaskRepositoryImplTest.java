@@ -157,4 +157,13 @@ public class TaskRepositoryImplTest {
         assertTrue(result.isEmpty());
         verify(mapper, never()).toDomain(any());
     }
+
+    @Test
+    @DisplayName("It should propagate DataAccessException when DAO fails")
+    void getCompletedTasks_DaoFails_ThrowsDataAccessException() {
+
+        when(taskDAO.findCompletedTasks()).thenThrow(new DataAccessException("DB Error"));
+
+        assertThrows(DataAccessException.class, () -> repository.getCompletedTasks());
+    }
 }
