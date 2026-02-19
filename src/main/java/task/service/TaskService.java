@@ -28,14 +28,20 @@ public class TaskService {
 
     }
 
-    public void updateTask(Task newTask) {
+    public String updateTask(Task newTask) {
         if (newTask == null) {
-            throw new IllegalArgumentException("Task cannot be null");
+            return "Error: Task cannot be null";
+        }
+        if (newTask.getId() == null) {
+            return "Error: Cannot update a task without an ID";
         }
         try {
             repository.modify(newTask);
+            return "Task with -id " + newTask.getId() + " updated successfully";
         } catch (DataAccessException e) {
-            throw new TaskNotFoundException(newTask.getId(), e);
+            return "Persistence error: " + e.getMessage();
+        } catch (Exception e) {
+            return "Unexpected error: " + e.getMessage();
         }
     }
 }
