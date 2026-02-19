@@ -27,6 +27,72 @@ public class TaskServiceGetTaskByIDTest {
     @InjectMocks
     private TaskService service;
 
+    /* =============================== create test methods =====================================*/
+    @Test
+    @DisplayName("Should return success message when task is created successfully")
+    void createTask_validTask_returnsSuccessMessage() {
+        Task newTask = TaskBuilder.newTask()
+                .withTitle("New Task")
+                .withDescription("Task description")
+                .build();
+
+        doNothing().when(repository).create(newTask);
+
+        String result = service.createTask(newTask);
+
+        assertEquals("New task New Task created", result);
+        verify(repository).create(newTask);
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException when task is null")
+    void createTask_nullTask_throwsIllegalArgumentException() {
+        Task nullTask = null;
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> service.createTask(nullTask)
+        );
+
+        assertEquals("CreateTask: Task cannot be null", exception.getMessage());
+        verifyNoInteractions(repository);
+    }
+
+    @Test
+    @DisplayName("Should return error message when repository throws IllegalArgumentException")
+    void createTask_invalidDataFormat_returnsErrorMessage() {
+        Task invalidTask = TaskBuilder.newTask()
+                .withTitle("Task")
+                .withDescription("new description")
+                .build();
+
+        doThrow(new IllegalArgumentException("The document can't be empty"))
+                .when(repository).create(invalidTask);
+
+        String result = service.createTask(invalidTask);
+
+        assertEquals("Something go wrong with data format", result);
+        verify(repository).create(invalidTask);
+    }
+
+    @Test
+    @DisplayName("Should return error message when database infrastructure failure occurs")
+    void createTask_dataAccessException_returnsErrorMessage() {
+        Task newTask = TaskBuilder.newTask()
+                .withTitle("New Task")
+                .withDescription("new description")
+                .build();
+
+        doThrow(new DataAccessException("MongoDB connection failed"))
+                .when(repository).create(newTask);
+
+        String result = service.createTask(newTask);
+
+        assertEquals("Error raised during task creation. Try again.", result);
+        verify(repository).create(newTask);
+    }
+
+    /* =============================== getTaskByID test methods =====================================*/
     @Test
     @DisplayName("GetTaskById must return the task with the requested ID")
     void testGetTaskById_Positive() {
@@ -61,6 +127,8 @@ public class TaskServiceGetTaskByIDTest {
             service.getTaskById(notExistentId);
         });
     }
+
+    /* =============================== remove test methods =====================================*/
 
     @Test
     @DisplayName("Should return a success message when the task is deleted correctly")
