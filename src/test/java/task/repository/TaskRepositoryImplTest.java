@@ -14,6 +14,7 @@ import task.mapper.TaskMapper;
 import task.model.Task;
 import task.model.TaskBuilder;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -124,11 +125,10 @@ public class TaskRepositoryImplTest {
     @Test
     @DisplayName("It should return a list of domain tasks when DAO returns documents")
     void getCompletedTasks_DocumentsExist_ReturnsMappedTaskList() {
-        // Given
+
         Document doc1 = new Document("title", "Task 1").append("state", "COMPLETED");
         List<Document> mockDocs = List.of(doc1);
 
-        // Usamos el builder con el Enum TaskState
         Task task1 = TaskBuilder.newTask()
                 .withTitle("Task 1")
                 .withDescription("Testing ReturnsMappedTaskList Description")
@@ -138,13 +138,23 @@ public class TaskRepositoryImplTest {
         when(taskDAO.findCompletedTasks()).thenReturn(mockDocs);
         when(mapper.toDomain(doc1)).thenReturn(task1);
 
-        // When
         List<Task> result = repository.getCompletedTasks();
 
-        // Then
         assertEquals(1, result.size());
         assertEquals(TaskState.COMPLETED, result.get(0).getTaskState());
         verify(taskDAO, times(1)).findCompletedTasks();
         verify(mapper, times(1)).toDomain(any(Document.class));
+    }
+
+    @Test
+    @DisplayName("It should return an empty list when DAO finds no completed tasks")
+    void getCompletedTasks_NoDocuments_ReturnsEmptyList() {
+
+        when(taskDAO.findCompletedTasks()).thenReturn(Collections.emptyList());
+
+        List<Task> result = repository.getCompletedTasks();
+
+        assertTrue(result.isEmpty());
+        verify(mapper, never()).toDomain(any());
     }
 }
