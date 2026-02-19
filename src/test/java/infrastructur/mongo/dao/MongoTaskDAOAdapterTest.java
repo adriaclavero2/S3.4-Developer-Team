@@ -38,6 +38,79 @@ public class MongoTaskDAOAdapterTest {
     @InjectMocks
     private MongoTaskDAOAdapter dao;
 
+    /* ============================== save method tests ==================================== */
+    @Test
+    @DisplayName("Should insert document successfully when valid document with title is provided")
+    void save_validDocumentWithTitle_insertsSuccessfully() {
+        Document validDoc = new Document("title", "New Task")
+                .append("description", "Task description");
+
+        assertDoesNotThrow(() -> dao.save(validDoc));
+
+        verify(collection).insertOne(validDoc);
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException when document is null")
+    void save_nullDocument_throwsIllegalArgumentException() {
+        Document nullDoc = null;
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> dao.save(nullDoc)
+        );
+
+        assertEquals("The document can't be empty", exception.getMessage());
+        verifyNoInteractions(collection);
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException when document is empty")
+    void save_emptyDocument_throwsIllegalArgumentException() {
+        Document emptyDoc = new Document();
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> dao.save(emptyDoc)
+        );
+
+        assertEquals("The document can't be empty", exception.getMessage());
+        verifyNoInteractions(collection);
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException when document lacks title field")
+    void save_documentWithoutTitle_throwsIllegalArgumentException() {
+        Document docWithoutTitle = new Document("description", "Some description")
+                .append("status", "pending");
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> dao.save(docWithoutTitle)
+        );
+
+        assertEquals("The task must have a title", exception.getMessage());
+        verifyNoInteractions(collection);
+    }
+
+    @Test
+    @DisplayName("Should throw DataAccessException when MongoDB raises an infrastructure error")
+    void save_mongoException_throwsDataAccessException() {
+        Document validDoc = new Document("title", "New Task");
+
+        doThrow(new MongoException("Simulated database error"))
+                .when(collection).insertOne(validDoc);
+
+        DataAccessException exception = assertThrows(
+                DataAccessException.class,
+                () -> dao.save(validDoc)
+        );
+
+        assertTrue(exception.getMessage().contains("MongoDB"));
+        verify(collection).insertOne(validDoc);
+    }
+
+    /* ============================== findByID method tests ==================================== */
     @Test
     @DisplayName("It must return a Document if the ID exists in Mongo")
     void findByID_Positive() {
@@ -68,6 +141,8 @@ public class MongoTaskDAOAdapterTest {
         assertTrue(result.isEmpty());
         // No hace falta mockear nada porque la excepción salta antes de llegar a la collection
     }
+
+    /* ============================== delete method tests ==================================== */
 
     @Test
     @DisplayName("Should complete without exception when task exists and is deleted")
