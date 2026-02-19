@@ -1,5 +1,8 @@
 package task.repository;
 
+import common.exception.DataAccessException;
+import common.exception.InvalidTaskIDException;
+import common.exception.TaskNotFoundException;
 import common.persistance.TaskDAO;
 import org.bson.Document;
 import org.junit.jupiter.api.DisplayName;
@@ -14,8 +17,7 @@ import task.model.TaskBuilder;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,5 +70,53 @@ public class TaskRepositoryImplTest {
         // Verificamos que el DAO se llamó, pero el Mapper NO (eficiencia)
         verify(taskDAO).findByID(id);
         verifyNoInteractions(mapper);// Si no existe el doc el mapper no se llama en el metodo, entonces con este metodo se verifica que no ha sido llamado
+    }
+
+    @Test
+    @DisplayName("Should complete without exception when the DAO deletes successfully")
+    void remove_taskExists() {
+        String validId = "69949f595f811f0d2276b457";
+
+        doNothing().when(taskDAO).delete(validId);
+        assertDoesNotThrow(() -> repository.remove(validId));
+
+        verify(taskDAO).delete(validId);
+    }
+
+    @Test
+    @DisplayName("Should propagate TaskNotFoundException when the DAO cannot find the task")
+    void remove_taskNotFound() {
+        String validId = "69949f595f811f0d2276b457";
+
+        doThrow(new TaskNotFoundException(validId)).when(taskDAO).delete(validId);
+
+        assertThrows(TaskNotFoundException.class, () -> repository.remove(validId));
+
+        verify(taskDAO).delete(validId);
+    }
+
+    @Test
+    @DisplayName("Should propagate InvalidTaskIDException when the ID format is invalid")
+    void remove_invalidIdFormat() {
+        String invalidId = "this-is-not-an-object-id";
+
+        doThrow(new InvalidTaskIDException("Invalid format: " + invalidId))
+                .when(taskDAO).delete(invalidId);
+
+        assertThrows(InvalidTaskIDException.class, () -> repository.remove(invalidId));
+
+        verify(taskDAO).delete(invalidId);
+    }
+
+    @Test
+    @DisplayName("Should propagate DataAccessException when a database infrastructure error occurs")
+    void remove_dataAccessException() {
+        String validId = "69949f595f811f0d2276b457";
+
+        doThrow(new DataAccessException("MongoDB failure")).when(taskDAO).delete(validId);
+
+        assertThrows(DataAccessException.class, () -> repository.remove(validId));
+
+        verify(taskDAO).delete(validId);
     }
 }

@@ -1,5 +1,7 @@
 package task.service;
 
+import common.exception.DataAccessException;
+import common.exception.InvalidTaskIDException;
 import common.exception.TaskNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,5 +60,54 @@ public class TaskServiceGetTaskByIDTest {
         assertThrows(TaskNotFoundException.class, () -> {
             service.getTaskById(notExistentId);
         });
+    }
+
+    @Test
+    @DisplayName("Should return a success message when the task is deleted correctly")
+    void removeTask_taskExists() {
+        String validId = "69949f595f811f0d2276b457";
+
+        doNothing().when(repository).remove(validId);
+        String result = service.removeTask(validId);
+
+        assertEquals("Task (" + validId + ") successfully deleted.", result);
+        verify(repository).remove(validId);
+    }
+
+    @Test
+    @DisplayName("Should return a not found message when the task does not exist")
+    void removeTask_taskNotFound() {
+        String validId = "69949f595f811f0d2276b457";
+
+        doThrow(new TaskNotFoundException(validId)).when(repository).remove(validId);
+        String result = service.removeTask(validId);
+
+        assertEquals("Task (" + validId + ") does not exist.", result);
+        verify(repository).remove(validId);
+    }
+
+    @Test
+    @DisplayName("Should return an invalid format message when the ID is malformed")
+    void removeTask_invalidIdFormat() {
+        String invalidId = "this-is-not-an-object-id";
+
+        doThrow(new InvalidTaskIDException("Invalid format: " + invalidId))
+                .when(repository).remove(invalidId);
+        String result = service.removeTask(invalidId);
+
+        assertEquals("Invalid id format.", result);
+        verify(repository).remove(invalidId);
+    }
+
+    @Test
+    @DisplayName("Should return an error message when a database infrastructure failure occurs")
+    void removeTask_dataAccessException() {
+        String validId = "69949f595f811f0d2276b457";
+
+        doThrow(new DataAccessException("MongoDB failure")).when(repository).remove(validId);
+        String result = service.removeTask(validId);
+
+        assertEquals("Error raised during task deletion. Try again.", result);
+        verify(repository).remove(validId);
     }
 }
