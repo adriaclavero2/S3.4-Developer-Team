@@ -8,6 +8,7 @@ import task.model.Task;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class TaskRepositoryImpl implements TaskRepository{
     private final TaskDAO taskDAO;
@@ -68,6 +69,9 @@ public class TaskRepositoryImpl implements TaskRepository{
 
     @Override
     public List<Task> getCompletedTasks() {
-        return List.of();
+        List<Document> docs = taskDAO.findCompletedTasks();
+        return docs.stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
     }
 }
