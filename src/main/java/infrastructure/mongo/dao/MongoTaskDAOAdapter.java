@@ -25,18 +25,17 @@ public class MongoTaskDAOAdapter implements TaskDAO {
 
     @Override
     public void save(Document doc) {
+        if (doc == null || doc.isEmpty())
+            throw new IllegalArgumentException("The document can't be empty");
+
+        if (!doc.containsKey("title"))
+            throw new IllegalArgumentException("The task must have a title");
+
         try {
-            if (doc == null || doc.isEmpty()) {
-                throw new IllegalArgumentException("The document can't be empty");
-            }
-            if (!doc.containsKey("title")) {
-                throw new IllegalArgumentException("The task must have a title");
-            }
             collection.insertOne(doc);
         } catch (MongoException e) {
             throw new DataAccessException("MongoDB", e);
         }
-
     }
 
     @Override
