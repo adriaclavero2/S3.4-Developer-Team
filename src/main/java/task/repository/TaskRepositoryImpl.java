@@ -21,13 +21,8 @@ public class TaskRepositoryImpl implements TaskRepository{
 
     @Override
     public void create(Task entity) {
-        try {
-            Document doc = mapper.toDocument(entity);
-            taskDAO.save(doc);
-            System.out.println("Log: task created successfully");
-        } catch (DataAccessException e) {
-            throw new DataAccessException("MongoDB" + e);
-        }
+        Document doc = mapper.toDocument(entity);
+        taskDAO.save(doc);
     }
 
     @Override
