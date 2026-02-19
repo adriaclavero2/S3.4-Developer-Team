@@ -9,10 +9,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import task.enums.TaskState;
 import task.mapper.TaskMapper;
 import task.model.Task;
 import task.model.TaskBuilder;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -117,5 +119,32 @@ public class TaskRepositoryImplTest {
 
         // Verificamos que aunque falle el DAO, el mapper sí llegó a trabajar
         verify(mapper).toDocument(mockTask);
+    }
+
+    @Test
+    @DisplayName("It should return a list of domain tasks when DAO returns documents")
+    void getCompletedTasks_DocumentsExist_ReturnsMappedTaskList() {
+        // Given
+        Document doc1 = new Document("title", "Task 1").append("state", "COMPLETED");
+        List<Document> mockDocs = List.of(doc1);
+
+        // Usamos el builder con el Enum TaskState
+        Task task1 = TaskBuilder.newTask()
+                .withTitle("Task 1")
+                .withDescription("Testing ReturnsMappedTaskList Description")
+                .withTaskState(TaskState.COMPLETED)
+                .build();
+
+        when(taskDAO.findCompletedTasks()).thenReturn(mockDocs);
+        when(mapper.toDomain(doc1)).thenReturn(task1);
+
+        // When
+        List<Task> result = repository.getCompletedTasks();
+
+        // Then
+        assertEquals(1, result.size());
+        assertEquals(TaskState.COMPLETED, result.get(0).getTaskState());
+        verify(taskDAO, times(1)).findCompletedTasks();
+        verify(mapper, times(1)).toDomain(any(Document.class));
     }
 }
