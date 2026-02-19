@@ -6,6 +6,7 @@ import com.mongodb.client.result.UpdateResult;
 import common.exception.DataAccessException;
 import infrastructure.mongo.dao.MongoTaskDAOAdapter;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -108,6 +110,20 @@ public class MongoTaskDAOAdapterTest {
 
         assertTrue(ex.getMessage().contains("MongoDB update error"));
         assertTrue(ex.getCause() instanceof RuntimeException);
+    }
+
+    @Test
+    @DisplayName("It should return a list of documents when MongoDB finds completed tasks")
+    void findCompleted_DocumentsExist_ReturnsDocumentList() {
+
+        List<Document> mockDocs = List.of(new Document("title", "Done"));
+        when(collection.find(any(Bson.class))).thenReturn(findIterable);
+        when(findIterable.into(any())).thenReturn(mockDocs);
+
+        List<Document> result = dao.findCompletedTasks();
+
+        assertFalse(result.isEmpty());
+        assertEquals("Done", result.get(0).get("title"));
     }
 
 }
