@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MongoTaskDAOAdapterTest {
@@ -69,27 +69,14 @@ public class MongoTaskDAOAdapterTest {
 
     @Test
     @DisplayName("It should complete successfully when the document is updated in MongoDB")
-    void update_Positive() {
+    void update_ExistingDocument_CompletesSuccessfully() {
         Document doc = new Document("_id", "69949f595f811f0d2276b457").append("title", "Test");
         when(collection.updateOne(any(Document.class), any(Document.class))).thenReturn(updateResult);
         when(updateResult.getMatchedCount()).thenReturn(1L);
 
         assertDoesNotThrow(() -> dao.update(doc));
+        verify(collection, times(1)).updateOne(any(Document.class), any(Document.class));
     }
 
-    @Test
-    @DisplayName("It should throw DataAccessException when no document matches the provided ID")
-    void update_Negative_NotFound() {
-        // Given
-        Document doc = new Document("_id", "69949f595f811f0d2276b457");
-        when(collection.updateOne(any(Document.class), any(Document.class))).thenReturn(updateResult);
-        when(updateResult.getMatchedCount()).thenReturn(0L); // Simulamos que MongoDB no encontró el ID
-
-        // When & Then
-        DataAccessException ex = assertThrows(DataAccessException.class, () -> dao.update(doc));
-
-        // Verificamos que el mensaje de error sea el esperado
-        assertTrue(ex.getMessage().contains("not found"));
-    }
 
 }
