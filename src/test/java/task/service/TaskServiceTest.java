@@ -128,4 +128,25 @@ public class TaskServiceTest {
         // Verificamos que NI SIQUIERA se intentó llamar al repositorio
         verify(repository, never()).modify(any());
     }
+
+    @Test
+    @DisplayName("It should return unexpected error message for non-data exceptions")
+    void testUpdateTask_Negative_UnexpectedException() {
+        // Given
+        Task mockTask = TaskBuilder.newTask()
+                .withTitle("Testing Title")
+                .withDescription("Testing Description")
+                .build();
+        mockTask.setId("69949f595f811f0d2276b457");
+
+        // Simulamos un error que NO sea de persistencia (ej. un RuntimeException cualquiera)
+        doThrow(new RuntimeException("Fatal system crash"))
+                .when(repository).modify(any(Task.class));
+
+        // When
+        String result = service.updateTask(mockTask);
+
+        // Then
+        assertTrue(result.contains("Unexpected error: Fatal system crash"));
+    }
 }
