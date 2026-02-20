@@ -1,4 +1,8 @@
 package task.dto;
 
-public record ErrorOutputDTO() {
+public record ErrorOutputDTO(String outputState) implements OutputDTO {
+    @Override
+    public String getOutputState() {
+        return outputState();
+    }
 }
