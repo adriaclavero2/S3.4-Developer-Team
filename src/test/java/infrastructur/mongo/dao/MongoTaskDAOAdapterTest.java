@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import task.enums.TaskState;
 
 import java.util.List;
 import java.util.Optional;
@@ -114,25 +115,33 @@ public class MongoTaskDAOAdapterTest {
 
     @Test
     @DisplayName("It should return a list of documents when MongoDB finds completed tasks")
-    void findCompleted_DocumentsExist_ReturnsDocumentList() {
+    void findTasksByStatus_DocumentsExist_ReturnsDocumentList() {
+        TaskState state = TaskState.COMPLETED;
+        List<Document> mockDocs = List.of(new Document("title", "Done").append("status", state.name()));
 
-        List<Document> mockDocs = List.of(new Document("title", "Done"));
         when(collection.find(any(Bson.class))).thenReturn(findIterable);
         when(findIterable.into(any())).thenReturn(mockDocs);
 
-        List<Document> result = dao.findCompletedTasks();
+        List<Document> result = dao.findTasksByStatus(TaskState.COMPLETED);
 
         assertFalse(result.isEmpty());
         assertEquals("Done", result.get(0).get("title"));
+        verify(collection).find(any(Bson.class));
     }
 
     @Test
     @DisplayName("It should throw DataAccessException when a technical database error occurs")
-    void findCompleted_MongoError_ThrowsDataAccessException() {
-
+    void findTasksByStatus_MongoError_ThrowsDataAccessException() {
+        TaskState state = TaskState.NOT_COMPLETED;
         when(collection.find(any(Bson.class))).thenThrow(new RuntimeException("Connection error"));
 
-        assertThrows(DataAccessException.class, () -> dao.findCompletedTasks());
+        DataAccessException exception = assertThrows(DataAccessException.class,
+                () -> dao.findTasksByStatus(state));
+
+        assertThrows(DataAccessException.class, () -> dao.findTasksByStatus(TaskState.NOT_COMPLETED));
+
+        assertTrue(exception.getMessage().contains(state.name()));
+        assertTrue(exception.getCause() instanceof RuntimeException);
     }
 
 }
