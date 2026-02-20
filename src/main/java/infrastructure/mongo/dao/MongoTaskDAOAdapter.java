@@ -2,7 +2,10 @@ package infrastructure.mongo.dao;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.result.DeleteResult;
 import common.exception.DataAccessException;
+import common.exception.InvalidTaskIDException;
+import common.exception.TaskNotFoundException;
 import common.persistance.TaskDAO;
 import org.bson.Document;
 import task.model.Task;
@@ -22,18 +25,17 @@ public class MongoTaskDAOAdapter implements TaskDAO {
 
     @Override
     public void save(Document doc) {
+        if (doc == null || doc.isEmpty())
+            throw new IllegalArgumentException("The document can't be empty");
+
+        if (!doc.containsKey("title"))
+            throw new IllegalArgumentException("The task must have a title");
+
         try {
-            if (doc == null || doc.isEmpty()) {
-                throw new IllegalArgumentException("The document can't be empty");
-            }
-            if (!doc.containsKey("title")) {
-                throw new IllegalArgumentException("The task must have a title");
-            }
             collection.insertOne(doc);
         } catch (MongoException e) {
             throw new DataAccessException("MongoDB", e);
         }
-
     }
 
     @Override
@@ -74,11 +76,20 @@ public class MongoTaskDAOAdapter implements TaskDAO {
 
     @Override
     public void delete(String id) {
+        DeleteResult deleteResult;
         try {
-            collection.deleteOne(new Document("_id", new org.bson.types.ObjectId(id)));
-        } catch (Exception e) {
+            Document filter = new Document("_id", new org.bson.types.ObjectId(id));
+            deleteResult = collection.deleteOne(filter);
+
+        } catch (IllegalArgumentException e) {
+            throw new InvalidTaskIDException("MongoDB delete, new document construction raised an error" + e.getMessage(), e);
+
+        } catch (MongoException e) {
             throw new DataAccessException("MongoDB delete", e);
         }
+
+        if (deleteResult.getDeletedCount() == 0)
+            throw new TaskNotFoundException(id);
     }
 
     @Override
