@@ -3,6 +3,7 @@ package task.service;
 
 import common.exception.DataAccessException;
 import common.exception.TaskNotFoundException;
+import task.enums.TaskState;
 import task.model.Task;
 import task.repository.TaskRepository;
 
@@ -47,17 +48,19 @@ public class TaskService {
         }
     }
 
-    public String listCompletedTasks() {
+    public String listTasksByStatus(TaskState state) {
         try {
-            List<Task> completedTasks = repository.getCompletedTasks();
+            List<Task> tasks = repository.getTasksByStatus(state);
 
-            if (completedTasks.isEmpty()) {
-                return "No tasks completed";
+            if (tasks.isEmpty()) {
+                return state == TaskState.COMPLETED ? "No tasks completed" : "No pending tasks";
             }
 
-            StringBuilder sb = new StringBuilder("--- COMPLETED TASKS ---\n");
-            for (Task task : completedTasks) {
-                sb.append(String.format("- %s: %s (Created: %s, Finished: %s)\n",
+            String header = state == TaskState.COMPLETED ? "--- COMPLETED TASKS ---" : "--- PENDING TASKS ---";
+            StringBuilder sb = new StringBuilder(header).append("\n");
+            for (Task task : tasks) {
+                sb.append(String.format("- [%s] %s: %s (Created: %s, Finished: %s)\n",
+                        task.getPriority(),
                         task.getTitle(),
                         task.getDescription(),
                         task.getCreationDate(),
