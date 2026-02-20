@@ -1,10 +1,10 @@
 package task.repository;
 
 import common.exception.DataAccessException;
-import common.exception.TaskNotFoundException;
 import common.persistance.TaskDAO;
 import common.utils.Mapper;
 import org.bson.Document;
+import task.mapper.TaskMapper;
 import task.model.Task;
 
 import java.util.List;
@@ -20,9 +20,10 @@ public class TaskRepositoryImpl implements TaskRepository{
     }
 
     @Override
-    public void create(Task entity) {
+    public Task create(Task entity) {
         Document doc = mapper.toDocument(entity);
-        taskDAO.save(doc);
+        doc = taskDAO.save(doc);
+        return mapper.toDomain(doc);
     }
 
     @Override
