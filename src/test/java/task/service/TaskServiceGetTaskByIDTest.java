@@ -9,15 +9,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import task.dto.ErrorOutputDTO;
-import task.dto.OutputDTO;
-import task.dto.OutputTaskDTO;
-import task.dto.TaskDTO;
+import task.dto.*;
 import task.mapper.TaskToDTOMapper;
 import task.model.Task;
 import task.model.TaskBuilder;
 import task.repository.TaskRepository;
 
+import java.util.Date;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -143,37 +141,58 @@ public class TaskServiceGetTaskByIDTest {
     @Test
     @DisplayName("GetTaskById must return the task with the requested ID")
     void testGetTaskById_Positive() {
-
         String id = "69949f595f811f0d2276b457";
 
-        Task mockTask =  TaskBuilder.newTask()
-                .withTitle("Testing Tittle")
+        Task mockTask = TaskBuilder.newTask()
+                .withTitle("Testing Title")
                 .withDescription("Description")
                 .build();
-
         mockTask.setId(id);
 
-        when(repository.getById(id)).thenReturn(Optional.of(mockTask));
+        OutputTaskDTO expectedOutput = new OutputTaskDTO(
+                id,
+                "Testing Title",
+                "Description",
+                null,
+                "20-02-2026 10:30:00",
+                "MEDIUM",
+                "NOT_COMPLETED",
+                "Task retrieved successfully"
+        );
 
-        OutputDTO result = service.getTaskById(id);
+        TaskIdDTO idDTO = new TaskIdDTO(id);
+
+        when(repository.getById(id)).thenReturn(Optional.of(mockTask));
+        when(mapper.taskToDto(mockTask, "Task retrieved successfully")).thenReturn(expectedOutput);
+
+        OutputDTO result = service.getTaskById(idDTO);
 
         assertNotNull(result, "Expected a task but received null");
-        assertEquals(id,((OutputTaskDTO) result).id(), "The Service should return the task with the requested ID");
+        assertInstanceOf(OutputTaskDTO.class, result);
+        assertEquals(id, ((OutputTaskDTO) result).id(), "The Service should return the task with the requested ID");
+        assertEquals("Task retrieved successfully", result.getOutputState());
 
-        verify(repository, times(1)).getById(id); // esto verifica que se llamo al repository
+        verify(repository, times(1)).getById(id);
+        verify(mapper, times(1)).taskToDto(mockTask, "Task retrieved successfully");
     }
 
     @Test
-    @DisplayName("You must throw an exception if the task does not exist in the database.")
-    void testGetTaskById_Negative(){
+    @DisplayName("Must return ErrorOutputDTO if the task does not exist in the database")
+    void testGetTaskById_Negative() {
         String notExistentId = "empty/null/wrong";
+        TaskIdDTO idDTO = new TaskIdDTO(notExistentId);
 
         when(repository.getById(notExistentId)).thenReturn(Optional.empty());
 
-        OutputDTO result = service.getTaskById(notExistentId);
-        assertEquals("Task not found", result.getOutputState());
-    }
+        OutputDTO result = service.getTaskById(idDTO);
 
+        assertNotNull(result);
+        assertInstanceOf(ErrorOutputDTO.class, result);
+        assertEquals("Task not found", result.getOutputState());
+
+        verify(repository, times(1)).getById(notExistentId);
+        verify(mapper, never()).taskToDto(any(), any());
+    }
     /* =============================== remove test methods =====================================*/
 
     @Test
@@ -182,9 +201,9 @@ public class TaskServiceGetTaskByIDTest {
         String validId = "69949f595f811f0d2276b457";
 
         doNothing().when(repository).remove(validId);
-        String result = service.removeTask(validId);
+        OutputDTO result = service.removeTask(new TaskIdDTO(validId));
 
-        assertEquals("Task (" + validId + ") successfully deleted.", result);
+        assertEquals("Task (" + validId + ") successfully deleted.", result.getOutputState());
         verify(repository).remove(validId);
     }
 
@@ -194,9 +213,9 @@ public class TaskServiceGetTaskByIDTest {
         String validId = "69949f595f811f0d2276b457";
 
         doThrow(new TaskNotFoundException(validId)).when(repository).remove(validId);
-        String result = service.removeTask(validId);
+        OutputDTO result = service.removeTask(new TaskIdDTO(validId));
 
-        assertEquals("Task (" + validId + ") does not exist.", result);
+        assertEquals("Task (" + validId + ") does not exist.", result.getOutputState());
         verify(repository).remove(validId);
     }
 
@@ -207,9 +226,9 @@ public class TaskServiceGetTaskByIDTest {
 
         doThrow(new InvalidTaskIDException("Invalid format: " + invalidId))
                 .when(repository).remove(invalidId);
-        String result = service.removeTask(invalidId);
+        OutputDTO result = service.removeTask(new TaskIdDTO(invalidId));
 
-        assertEquals("Invalid id format.", result);
+        assertEquals("Invalid id format.", result.getOutputState());
         verify(repository).remove(invalidId);
     }
 
@@ -219,9 +238,9 @@ public class TaskServiceGetTaskByIDTest {
         String validId = "69949f595f811f0d2276b457";
 
         doThrow(new DataAccessException("MongoDB failure")).when(repository).remove(validId);
-        String result = service.removeTask(validId);
+        OutputDTO result = service.removeTask(new TaskIdDTO(validId));
 
-        assertEquals("Error raised during task deletion. Try again.", result);
+        assertEquals("Error raised during task deletion. Try again.", result.getOutputState());
         verify(repository).remove(validId);
     }
 }

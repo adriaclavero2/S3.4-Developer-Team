@@ -3,10 +3,7 @@ package task.service;
 import common.exception.DataAccessException;
 import common.exception.InvalidTaskIDException;
 import common.exception.TaskNotFoundException;
-import task.dto.ErrorOutputDTO;
-import task.dto.OutputDTO;
-import task.dto.OutputTaskDTO;
-import task.dto.TaskDTO;
+import task.dto.*;
 import task.mapper.TaskToDTOMapper;
 import task.model.Task;
 import task.repository.TaskRepository;
@@ -38,7 +35,8 @@ public class TaskService {
         }
     }
 
-    public OutputDTO getTaskById(String id) {
+    public OutputDTO getTaskById(TaskIdDTO idDTO) {
+        String id = idDTO.id();
         Optional<Task> taskOptional = repository.getById(id);
 
         if(taskOptional.isEmpty())
@@ -48,17 +46,18 @@ public class TaskService {
         return mapper.taskToDto(output, "Task retrieved successfully");
     }
 
-    public String removeTask(String id) {
+    public OutputDTO removeTask(TaskIdDTO idDTo) {
         try {
+            String id = idDTo.id();
             repository.remove(id);
-            return "Task (" + id + ") successfully deleted.";
+            return new HappyOutputDTO("Task (" + id + ") successfully deleted.");
 
         } catch (TaskNotFoundException e) {
-            return "Task (" + id + ") does not exist.";
+            return new ErrorOutputDTO("Task (" + idDTo.id() + ") does not exist.");
         } catch (InvalidTaskIDException e) {
-            return "Invalid id format.";
+            return new ErrorOutputDTO("Invalid id format.");
         } catch (DataAccessException e) {
-            return "Error raised during task deletion. Try again.";
+            return new ErrorOutputDTO("Error raised during task deletion. Try again.");
         }
     }
 }
