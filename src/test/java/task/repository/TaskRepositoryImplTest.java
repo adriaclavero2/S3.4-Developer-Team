@@ -3,7 +3,6 @@ package task.repository;
 import common.exception.DataAccessException;
 import common.exception.InvalidTaskIDException;
 import common.exception.TaskNotFoundException;
-import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
 import org.bson.Document;
 import org.junit.jupiter.api.DisplayName;
@@ -129,11 +128,6 @@ public class TaskRepositoryImplTest {
         Task mockTask = TaskBuilder.newTask()
                 .withTitle("Test Task")
                 .withDescription("Test description")
-                .build();
-        Document mockDoc = new Document("_id", id).append("title", "Test Task");
-        Task mockTask = TaskBuilder.newTask()
-                .withTitle("Test Task")
-                .withDescription("description")
                 .build();
 
         when(taskDAO.findByID(id)).thenReturn(Optional.of(mockDoc));

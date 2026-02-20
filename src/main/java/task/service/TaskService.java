@@ -3,7 +3,6 @@ package task.service;
 
 import common.exception.DataAccessException;
 import common.exception.InvalidTaskIDException;
-import common.exception.DataAccessException;
 import common.exception.TaskNotFoundException;
 import task.enums.TaskState;
 import task.model.Task;
@@ -27,9 +26,9 @@ public class TaskService {
 
         try {
             repository.create(newTask);
-            System.out.println("New task " + newTask.getTitle() + " created");
+            return "New task " + newTask.getTitle() + " created";
         } catch (RuntimeException e) {
-            System.err.println(e.getMessage());
+            return "Unexpected error: " + e.getMessage();
         }
     }
 

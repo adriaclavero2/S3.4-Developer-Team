@@ -3,14 +3,15 @@ package infrastructure.mongo.dao;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.result.UpdateResult;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 import common.exception.DataAccessException;
+import common.exception.InvalidTaskIDException;
+import common.exception.TaskNotFoundException;
 import common.persistance.TaskDAO;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import task.enums.TaskState;
-import task.model.Task;
 
 import java.util.ArrayList;
 import java.util.List;
