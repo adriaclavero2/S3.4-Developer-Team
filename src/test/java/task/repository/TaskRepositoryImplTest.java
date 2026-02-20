@@ -48,7 +48,7 @@ public class TaskRepositoryImplTest {
                 .append("description", "Task description");
 
         when(mapper.toDocument(mockTask)).thenReturn(mockDoc);
-        doNothing().when(taskDAO).save(mockDoc);
+        when(taskDAO.save(mockDoc)).thenReturn(mockDoc);
 
         assertDoesNotThrow(() -> repository.create(mockTask));
 

@@ -1,54 +1,63 @@
 package task.service;
 
-
 import common.exception.DataAccessException;
 import common.exception.InvalidTaskIDException;
 import common.exception.TaskNotFoundException;
-import task.enums.TaskState;
+import task.dto.*;
+import task.mapper.TaskToDTOMapper;
 import task.model.Task;
 import task.repository.TaskRepository;
 
-import java.util.List;
+import java.util.Optional;
 
 public class TaskService {
     private final TaskRepository repository;
+    private final TaskToDTOMapper mapper;
 
-    public TaskService(TaskRepository repository) {
+    public TaskService(TaskRepository repository, TaskToDTOMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
-    public String createTask(Task newTask) {
-
-        if(newTask == null){
+    public OutputDTO createTask(TaskDTO input) {
+        if(input == null){
             throw new IllegalArgumentException("CreateTask: Task cannot be null");
-            // or return "Provide a task to create";
         }
 
         try {
-            repository.create(newTask);
-            return "New task " + newTask.getTitle() + " created";
-        } catch (RuntimeException e) {
-            return "Unexpected error: " + e.getMessage();
+            Task newTask = mapper.dtoToTask(input);
+            Task createdTask = repository.create(newTask);
+            return mapper.taskToDto(createdTask, "New Task created");
+        } catch (IllegalArgumentException e) {
+            return new ErrorOutputDTO("Something go wrong with data format");
+        } catch (DataAccessException e) {
+            return new ErrorOutputDTO("Error raised during task creation. Try again.");
         }
     }
 
-    public Task getTaskById(String id) {
-        return repository.getById(id)
-                .orElseThrow(() -> new TaskNotFoundException(id));
+    public OutputDTO getTaskById(TaskIdDTO idDTO) {
+        String id = idDTO.id();
+        Optional<Task> taskOptional = repository.getById(id);
 
+        if(taskOptional.isEmpty())
+            return new ErrorOutputDTO("Task not found");
+
+        Task output = taskOptional.get();
+        return mapper.taskToDto(output, "Task retrieved successfully");
     }
 
-    public String removeTask(String id) {
+    public OutputDTO removeTask(TaskIdDTO idDTo) {
         try {
+            String id = idDTo.id();
             repository.remove(id);
-            return "Task (" + id + ") successfully deleted.";
+            return new HappyOutputDTO("Task (" + id + ") successfully deleted.");
 
         } catch (TaskNotFoundException e) {
-            return "Task (" + id + ") does not exist.";
+            return new ErrorOutputDTO("Task (" + idDTo.id() + ") does not exist.");
         } catch (InvalidTaskIDException e) {
-            return "Invalid id format.";
+            return new ErrorOutputDTO("Invalid id format.");
         } catch (DataAccessException e) {
-            return "Error raised during task deletion. Try again.";
+            return new ErrorOutputDTO("Error raised during task deletion. Try again.");
         }
     }
 

@@ -10,8 +10,8 @@ import common.exception.InvalidTaskIDException;
 import common.exception.TaskNotFoundException;
 import common.persistance.TaskDAO;
 import org.bson.Document;
-import org.bson.conversions.Bson;
-import task.enums.TaskState;
+import org.bson.types.ObjectId;
+import task.model.Task;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class MongoTaskDAOAdapter implements TaskDAO {
     }
 
     @Override
-    public void save(Document doc) {
+    public Document save(Document doc) {
         if (doc == null || doc.isEmpty())
             throw new IllegalArgumentException("The document can't be empty");
 
@@ -37,9 +37,12 @@ public class MongoTaskDAOAdapter implements TaskDAO {
 
         try {
             collection.insertOne(doc);
+            return doc;
+
         } catch (MongoException e) {
             throw new DataAccessException("MongoDB", e);
         }
+
     }
 
     @Override

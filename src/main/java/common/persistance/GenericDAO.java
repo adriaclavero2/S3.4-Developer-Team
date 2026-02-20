@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface GenericDAO<T, ID> {
 
-    void save(T entity);
+    T save(T entity);
     Optional<T> findByID(ID id);
     List<T> findAll();
     void update(T entity);
