@@ -35,7 +35,8 @@ public class TaskServiceTest {
         String id = "69949f595f811f0d2276b457";
 
         Task mockTask =  TaskBuilder.newTask()
-                .title("Testing Tittle")
+                .withTitle("Testing Tittle")
+                .withDescription("")
                 .build();
 
         mockTask.setId(id);
