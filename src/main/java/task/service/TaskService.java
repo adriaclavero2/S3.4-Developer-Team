@@ -11,6 +11,8 @@ import task.mapper.TaskToDTOMapper;
 import task.model.Task;
 import task.repository.TaskRepository;
 
+import java.util.Optional;
+
 public class TaskService {
     private final TaskRepository repository;
     private final TaskToDTOMapper mapper = new TaskToDTOMapper();
@@ -34,10 +36,14 @@ public class TaskService {
         }
     }
 
-    public Task getTaskById(String id) {
-        return repository.getById(id)
-                .orElseThrow(() -> new TaskNotFoundException(id));
+    public OutputDTO getTaskById(String id) {
+        Optional<Task> taskOptional = repository.getById(id);
 
+        if(taskOptional.isEmpty())
+            return new ErrorOutputDTO("Task not found");
+
+        Task output = taskOptional.get();
+        return mapper.taskToDto(output, "Task retrieved successfully");
     }
 
     public String removeTask(String id) {

@@ -110,10 +110,10 @@ public class TaskServiceGetTaskByIDTest {
 
         when(repository.getById(id)).thenReturn(Optional.of(mockTask));
 
-        Task result = service.getTaskById(id);
+        OutputDTO result = service.getTaskById(id);
 
         assertNotNull(result, "Expected a task but received null");
-        assertEquals(id, result.getId(), "The Service should return the task with the requested ID");
+        assertEquals(id,((OutputTaskDTO) result).id(), "The Service should return the task with the requested ID");
 
         verify(repository, times(1)).getById(id); // esto verifica que se llamo al repository
     }
@@ -125,9 +125,8 @@ public class TaskServiceGetTaskByIDTest {
 
         when(repository.getById(notExistentId)).thenReturn(Optional.empty());
 
-        assertThrows(TaskNotFoundException.class, () -> {
-            service.getTaskById(notExistentId);
-        });
+        OutputDTO result = service.getTaskById(notExistentId);
+        assertEquals("Task not found", result.getOutputState());
     }
 
     /* =============================== remove test methods =====================================*/
