@@ -4,6 +4,7 @@ import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
 import common.utils.Mapper;
 import org.bson.Document;
+import task.enums.TaskState;
 import task.model.Task;
 
 import java.util.List;
@@ -68,8 +69,8 @@ public class TaskRepositoryImpl implements TaskRepository{
     }
 
     @Override
-    public List<Task> getCompletedTasks() {
-        List<Document> docs = taskDAO.findCompletedTasks();
+    public List<Task> getTasksByStatus(TaskState state) {
+        List<Document> docs = taskDAO.findTasksByStatus(state);
         return docs.stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
