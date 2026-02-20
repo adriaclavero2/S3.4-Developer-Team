@@ -26,7 +26,7 @@ public class TaskToDTOMapper {
         return task;
     }
 
-    public OutputTaskDTO taskToDto(Task task) {
+    public OutputTaskDTO taskToDto(Task task, String outputState) {
         String creationDate = task.getCreationDate().format(formatter);
         String expireDate = task.getExpireDate() != null ? task.getCreationDate().format(formatter) : "undefined";
 
@@ -38,7 +38,8 @@ public class TaskToDTOMapper {
                 expireDate,
                 creationDate,
                 task.getPriority().toString(),
-                task.getTaskState().toString());
+                task.getTaskState().toString(),
+                outputState);
 
         return output;
     }
