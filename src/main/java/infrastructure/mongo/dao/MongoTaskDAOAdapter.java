@@ -89,14 +89,12 @@ public class MongoTaskDAOAdapter implements TaskDAO {
     }
 
     @Override
-    public List<Document> findCompletedTasks() {
+    public List<Document> findTasksByStatus(TaskState state) {
         try {
-            // Filtramos por el campo que indique que está completada
-            String statusValue = TaskState.COMPLETED.name();
-            Bson filter = Filters.eq("status", statusValue);
+            Bson filter = Filters.eq("status", state.name());
             return collection.find(filter).into(new ArrayList<>());
         } catch (Exception e) {
-            throw new DataAccessException("Error retrieving completed tasks from MongoDB", e);
+            throw new DataAccessException("Error retrieving tasks with state " + state + " from MongoDB", e);
         }
     }
 }
