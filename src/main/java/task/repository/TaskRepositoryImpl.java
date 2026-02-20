@@ -1,6 +1,7 @@
 package task.repository;
 
 import common.exception.DataAccessException;
+import common.exception.TaskNotFoundException;
 import common.persistance.TaskDAO;
 import common.utils.Mapper;
 import org.bson.Document;
@@ -22,13 +23,8 @@ public class TaskRepositoryImpl implements TaskRepository{
 
     @Override
     public void create(Task entity) {
-        try {
-            Document doc = mapper.toDocument(entity);
-            taskDAO.save(doc);
-            System.out.println("Log: task created successfully");
-        } catch (DataAccessException e) {
-            throw new DataAccessException("MongoDB" + e);
-        }
+        Document doc = mapper.toDocument(entity);
+        taskDAO.save(doc);
     }
 
     @Override
@@ -59,13 +55,7 @@ public class TaskRepositoryImpl implements TaskRepository{
 
     @Override
     public void remove(String id) {
-        try {
-            taskDAO.delete(id);
-            System.out.println("Log: task deleted successfully");
-        } catch (DataAccessException e) {
-            throw new DataAccessException("Error al eliminar la tarea: " + e.getMessage());
-        }
-
+        taskDAO.delete(id);
     }
 
     @Override
