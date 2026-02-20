@@ -154,31 +154,80 @@ public class TaskServiceTest {
 
     @Test
     @DisplayName("It should return a formatted list when completed tasks exist")
-    void listCompletedTasks_TasksExist_ReturnsFormattedString() {
+    void listTasksByStatus_CompletedTask_ReturnsFormattedString() {
 
+        TaskState state = TaskState.COMPLETED;
         Task task = TaskBuilder.newTask()
                 .withTitle("Testing Title")
                 .withDescription("Testing Description")
+                .withPriority(Priority.HIGH)
                 .build();
 
-        when(repository.getCompletedTasks()).thenReturn(List.of(task));
+        when(repository.getTasksByStatus(state)).thenReturn(List.of(task));
 
-        String result = service.listCompletedTasks();
+        String result = service.listTasksByStatus(state);
 
         assertTrue(result.contains("Testing Title"));
-        verify(repository, times(1)).getCompletedTasks();
+        assertTrue(result.contains("[HIGH]"));
+        verify(repository, times(1)).getTasksByStatus(state);
     }
 
     @Test
-    @DisplayName("It should return an informative message when no completed tasks are found")
-    void listCompletedTasks_NoTasks_ReturnsEmptyListMessage() {
+    @DisplayName("It should return a formatted list with priority when pending tasks exist")
+    void listTasksByStatus_PendingTask_ReturnsFormattedString() {
+
+        TaskState state = TaskState.NOT_COMPLETED;
+        Task task = TaskBuilder.newTask()
+                .withTitle("Testing Title")
+                .withDescription("Testing Description")
+                .withPriority(Priority.HIGH)
+                .build();
+
+        when(repository.getTasksByStatus(state)).thenReturn(List.of(task));
+
+        String result = service.listTasksByStatus(state);
+
+        assertTrue(result.contains("Testing Title"));
+        assertTrue(result.contains("[HIGH]"));
+        verify(repository, times(1)).getTasksByStatus(state);
+    }
+
+    @Test
+    @DisplayName("It should return the correct message when no pending tasks are found")
+    void listTasksByStatus_NoPendingTasks_ReturnsSpecificMessage() {
         // Given
-        when(repository.getCompletedTasks()).thenReturn(Collections.emptyList());
+        when(repository.getTasksByStatus(TaskState.NOT_COMPLETED)).thenReturn(Collections.emptyList());
 
         // When
-        String result = service.listCompletedTasks();
+        String result = service.listTasksByStatus(TaskState.NOT_COMPLETED);
+
+        // Then
+        assertEquals("No pending tasks", result);
+    }
+    @Test
+    @DisplayName("It should return the correct message when no completed tasks are found")
+    void listTasksByStatus_NoCompletedTasks_ReturnsSpecificMessage() {
+        // Given
+        when(repository.getTasksByStatus(TaskState.COMPLETED)).thenReturn(Collections.emptyList());
+
+        // When
+        String result = service.listTasksByStatus(TaskState.COMPLETED);
 
         // Then
         assertEquals("No tasks completed", result);
+    }
+
+    @Test
+    @DisplayName("It should return a persistence error message when repository throws DataAccessException")
+    void listTasksByStatus_RepositoryFails_ReturnsErrorMessage() {
+        // Given
+        when(repository.getTasksByStatus(any())).thenThrow(new DataAccessException("Connection lost"));
+
+        // When
+        String result = service.listTasksByStatus(TaskState.NOT_COMPLETED);
+
+        // Then
+        assertTrue(result.contains("Persistence error"));
+        assertTrue(result.contains("Connection lost"));
     }
 }
