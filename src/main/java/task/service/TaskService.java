@@ -4,31 +4,33 @@ package task.service;
 import common.exception.DataAccessException;
 import common.exception.InvalidTaskIDException;
 import common.exception.TaskNotFoundException;
+import task.dto.ErrorOutputDTO;
+import task.dto.OutputDTO;
+import task.dto.OutputTaskDTO;
+import task.mapper.TaskToDTOMapper;
 import task.model.Task;
 import task.repository.TaskRepository;
 
 public class TaskService {
     private final TaskRepository repository;
+    private final TaskToDTOMapper mapper = new TaskToDTOMapper();
 
     public TaskService(TaskRepository repository) {
         this.repository = repository;
     }
 
-    public String createTask(Task newTask) {
-
+    public OutputDTO createTask(Task newTask) {
         if(newTask == null){
             throw new IllegalArgumentException("CreateTask: Task cannot be null");
-            // or return "Provide a task to create";
         }
 
         try {
-            repository.create(newTask);
-            return "New task " + newTask.getTitle() + " created";
-
+            Task createdTask = repository.create(newTask);
+            return mapper.taskToDto(createdTask, "New Task created");
         } catch (IllegalArgumentException e) {
-            return "Something go wrong with data format";
+            return new ErrorOutputDTO("Something go wrong with data format");
         } catch (DataAccessException e) {
-            return "Error raised during task creation. Try again.";
+            return new ErrorOutputDTO("Error raised during task creation. Try again.");
         }
     }
 
