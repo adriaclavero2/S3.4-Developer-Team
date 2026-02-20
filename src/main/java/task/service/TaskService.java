@@ -1,12 +1,12 @@
 package task.service;
 
-
 import common.exception.DataAccessException;
 import common.exception.InvalidTaskIDException;
 import common.exception.TaskNotFoundException;
 import task.dto.ErrorOutputDTO;
 import task.dto.OutputDTO;
 import task.dto.OutputTaskDTO;
+import task.dto.TaskDTO;
 import task.mapper.TaskToDTOMapper;
 import task.model.Task;
 import task.repository.TaskRepository;
@@ -15,18 +15,20 @@ import java.util.Optional;
 
 public class TaskService {
     private final TaskRepository repository;
-    private final TaskToDTOMapper mapper = new TaskToDTOMapper();
+    private final TaskToDTOMapper mapper;
 
-    public TaskService(TaskRepository repository) {
+    public TaskService(TaskRepository repository, TaskToDTOMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
-    public OutputDTO createTask(Task newTask) {
-        if(newTask == null){
+    public OutputDTO createTask(TaskDTO input) {
+        if(input == null){
             throw new IllegalArgumentException("CreateTask: Task cannot be null");
         }
 
         try {
+            Task newTask = mapper.dtoToTask(input);
             Task createdTask = repository.create(newTask);
             return mapper.taskToDto(createdTask, "New Task created");
         } catch (IllegalArgumentException e) {
