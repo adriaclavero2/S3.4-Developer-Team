@@ -195,38 +195,32 @@ public class TaskServiceTest {
     @Test
     @DisplayName("It should return the correct message when no pending tasks are found")
     void listTasksByStatus_NoPendingTasks_ReturnsSpecificMessage() {
-        // Given
-        when(repository.getTasksByStatus(TaskState.NOT_COMPLETED)).thenReturn(Collections.emptyList());
+        TaskState state = TaskState.NOT_COMPLETED;
+        when(repository.getTasksByStatus(state)).thenReturn(Collections.emptyList());
 
-        // When
-        String result = service.listTasksByStatus(TaskState.NOT_COMPLETED);
+        String result = service.listTasksByStatus(state);
 
-        // Then
         assertEquals("No pending tasks", result);
     }
     @Test
     @DisplayName("It should return the correct message when no completed tasks are found")
     void listTasksByStatus_NoCompletedTasks_ReturnsSpecificMessage() {
-        // Given
-        when(repository.getTasksByStatus(TaskState.COMPLETED)).thenReturn(Collections.emptyList());
+        TaskState state = TaskState.COMPLETED;
+        when(repository.getTasksByStatus(state)).thenReturn(Collections.emptyList());
 
-        // When
-        String result = service.listTasksByStatus(TaskState.COMPLETED);
+        String result = service.listTasksByStatus(state);
 
-        // Then
         assertEquals("No tasks completed", result);
     }
 
     @Test
     @DisplayName("It should return a persistence error message when repository throws DataAccessException")
     void listTasksByStatus_RepositoryFails_ReturnsErrorMessage() {
-        // Given
+        TaskState state = TaskState.NOT_COMPLETED;
         when(repository.getTasksByStatus(any())).thenThrow(new DataAccessException("Connection lost"));
 
-        // When
-        String result = service.listTasksByStatus(TaskState.NOT_COMPLETED);
+        String result = service.listTasksByStatus(state);
 
-        // Then
         assertTrue(result.contains("Persistence error"));
         assertTrue(result.contains("Connection lost"));
     }
