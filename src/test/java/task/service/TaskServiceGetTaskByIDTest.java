@@ -9,6 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import task.dto.OutputDTO;
+import task.dto.OutputTaskDTO;
 import task.model.Task;
 import task.model.TaskBuilder;
 import task.repository.TaskRepository;
@@ -36,11 +38,11 @@ public class TaskServiceGetTaskByIDTest {
                 .withDescription("Task description")
                 .build();
 
-        doNothing().when(repository).create(newTask);
+        when(repository.create(newTask)).thenReturn(newTask);
 
-        String result = service.createTask(newTask);
+        OutputDTO result = service.createTask(newTask);
 
-        assertEquals("New task New Task created", result);
+        assertEquals("New Task created", result.getOutputState());
         verify(repository).create(newTask);
     }
 
@@ -69,9 +71,9 @@ public class TaskServiceGetTaskByIDTest {
         doThrow(new IllegalArgumentException("The document can't be empty"))
                 .when(repository).create(invalidTask);
 
-        String result = service.createTask(invalidTask);
+        OutputDTO result = service.createTask(invalidTask);
 
-        assertEquals("Something go wrong with data format", result);
+        assertEquals("Something go wrong with data format", result.getOutputState());
         verify(repository).create(invalidTask);
     }
 
@@ -86,9 +88,9 @@ public class TaskServiceGetTaskByIDTest {
         doThrow(new DataAccessException("MongoDB connection failed"))
                 .when(repository).create(newTask);
 
-        String result = service.createTask(newTask);
+        OutputDTO result = service.createTask(newTask);
 
-        assertEquals("Error raised during task creation. Try again.", result);
+        assertEquals("Error raised during task creation. Try again.", result.getOutputState());
         verify(repository).create(newTask);
     }
 
