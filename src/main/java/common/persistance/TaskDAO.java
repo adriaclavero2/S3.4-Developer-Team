@@ -1,10 +1,10 @@
 package common.persistance;
 
 import org.bson.Document;
-import task.model.Task;
+import task.enums.TaskState;
 import java.util.List;
 
 public interface TaskDAO extends GenericDAO<Document, String> {
 
-    List<Task> findCompletedTasks();
+    List<Document> findTasksByStatus(TaskState state);
 }
