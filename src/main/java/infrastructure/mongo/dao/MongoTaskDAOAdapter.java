@@ -2,14 +2,17 @@ package infrastructure.mongo.dao;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.UpdateResult;
 import com.mongodb.client.result.DeleteResult;
 import common.exception.DataAccessException;
-import common.exception.InvalidTaskIDException;
-import common.exception.TaskNotFoundException;
 import common.persistance.TaskDAO;
 import org.bson.Document;
+import org.bson.conversions.Bson;
+import task.enums.TaskState;
 import task.model.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,20 +59,22 @@ public class MongoTaskDAOAdapter implements TaskDAO {
 
     @Override
     public void update(Document doc) {
+        Object idValue = doc.get("_id");
         try {
-            Object idValue = doc.get("_id");
-            if (idValue == null) {
-                throw new IllegalArgumentException("The document must have a -id to be update");
-            }
-
             Document filter = new Document("_id", idValue);
-
             Document docToUpdate = new Document(doc);
             docToUpdate.remove("_id");
 
-            collection.updateOne(filter, new Document("$set", docToUpdate)); /*Metodo de Mongo para update. En new Document "$set" lo va a interpretar como la funcion set de mongo y modifica el elemento en el server. las key que comienzan con $ se interpretan como operadores de accion*/
+            UpdateResult result = collection.updateOne(filter, new Document("$set", docToUpdate)); /*Metodo de Mongo para update. En new Document "$set" lo va a interpretar como la funcion set de mongo y modifica el elemento en el server. las key que comienzan con $ se interpretan como operadores de accion*/
+
+            if(result.getMatchedCount() == 0) {
+                throw new DataAccessException("Task with _id " + idValue + " not found.");
+            }
+        } catch (DataAccessException e) {
+            // Si es nuestra propia excepción de "no encontrado", la relanzamos tal cual
+            throw e;
         } catch (Exception e) {
-            throw new DataAccessException("MongoDB update", e);
+            throw new DataAccessException("MongoDB update error ", e);
         }
 
     }
@@ -93,7 +98,12 @@ public class MongoTaskDAOAdapter implements TaskDAO {
     }
 
     @Override
-    public List<Task> findCompletedTasks() {
-        return List.of();
+    public List<Document> findTasksByStatus(TaskState state) {
+        try {
+            Bson filter = Filters.eq("status", state.name());
+            return collection.find(filter).into(new ArrayList<>());
+        } catch (Exception e) {
+            throw new DataAccessException("Error retrieving tasks with state " + state + " from MongoDB", e);
+        }
     }
 }

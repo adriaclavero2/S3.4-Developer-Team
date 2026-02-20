@@ -5,10 +5,12 @@ import common.exception.TaskNotFoundException;
 import common.persistance.TaskDAO;
 import common.utils.Mapper;
 import org.bson.Document;
+import task.enums.TaskState;
 import task.model.Task;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class TaskRepositoryImpl implements TaskRepository{
     private final TaskDAO taskDAO;
@@ -44,13 +46,10 @@ public class TaskRepositoryImpl implements TaskRepository{
 
     @Override
     public void modify(Task entity) {
-        try {
+
             Document doc = mapper.toDocument(entity);
             taskDAO.update(doc);
             System.out.println("Log: task updated successfully");
-        } catch (DataAccessException e) {
-            throw new DataAccessException("Error modifying task: " + e.getMessage());
-        }
 
     }
 
@@ -60,7 +59,10 @@ public class TaskRepositoryImpl implements TaskRepository{
     }
 
     @Override
-    public List<Task> getCompletedTasks() {
-        return List.of();
+    public List<Task> getTasksByStatus(TaskState state) {
+        List<Document> docs = taskDAO.findTasksByStatus(state);
+        return docs.stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
     }
 }
