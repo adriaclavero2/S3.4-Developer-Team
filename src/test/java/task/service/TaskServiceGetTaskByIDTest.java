@@ -9,8 +9,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import task.dto.ErrorOutputDTO;
 import task.dto.OutputDTO;
 import task.dto.OutputTaskDTO;
+import task.dto.TaskDTO;
+import task.mapper.TaskToDTOMapper;
 import task.model.Task;
 import task.model.TaskBuilder;
 import task.repository.TaskRepository;
@@ -24,6 +27,9 @@ import static org.mockito.Mockito.*;
 public class TaskServiceGetTaskByIDTest {
 
     @Mock
+    private TaskToDTOMapper mapper;
+
+    @Mock
     private TaskRepository repository;
 
     @InjectMocks
@@ -33,67 +39,106 @@ public class TaskServiceGetTaskByIDTest {
     @Test
     @DisplayName("Should return success message when task is created successfully")
     void createTask_validTask_returnsSuccessMessage() {
-        Task newTask = TaskBuilder.newTask()
+        TaskDTO inputDTO = new TaskDTO("New Task", "Task Description", "", "medium");
+
+        Task taskToCreate = TaskBuilder.newTask()
                 .withTitle("New Task")
-                .withDescription("Task description")
+                .withDescription("Task Description")
                 .build();
 
-        when(repository.create(newTask)).thenReturn(newTask);
+        Task createdTask = TaskBuilder.newTask()
+                .withTitle("New Task")
+                .withDescription("Task Description")
+                .build();
+        createdTask.setId("123456");
 
-        OutputDTO result = service.createTask(newTask);
+        OutputTaskDTO expectedOutput = new OutputTaskDTO(
+                "123456",
+                "New Task",
+                "Task Description",
+                null,
+                "20-02-2026 10:30:00",
+                "MEDIUM",
+                "NOT_COMPLETED",
+                "New Task created"
+        );
+
+        when(mapper.dtoToTask(inputDTO)).thenReturn(taskToCreate);
+        when(repository.create(any(Task.class))).thenReturn(createdTask);
+        when(mapper.taskToDto(createdTask, "New Task created")).thenReturn(expectedOutput);
+
+        OutputDTO result = service.createTask(inputDTO);
 
         assertEquals("New Task created", result.getOutputState());
-        verify(repository).create(newTask);
+        assertInstanceOf(OutputTaskDTO.class, result);
+
+        verify(mapper).dtoToTask(inputDTO);
+        verify(repository).create(any(Task.class));
+        verify(mapper).taskToDto(createdTask, "New Task created");
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when task is null")
+    @DisplayName("Should throw IllegalArgumentException when TaskDTO is null")
     void createTask_nullTask_throwsIllegalArgumentException() {
-        Task nullTask = null;
+        TaskDTO nullTaskDTO = null;
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> service.createTask(nullTask)
+                () -> service.createTask(nullTaskDTO)
         );
 
         assertEquals("CreateTask: Task cannot be null", exception.getMessage());
         verifyNoInteractions(repository);
+        verifyNoInteractions(mapper);
     }
 
     @Test
     @DisplayName("Should return error message when repository throws IllegalArgumentException")
     void createTask_invalidDataFormat_returnsErrorMessage() {
-        Task invalidTask = TaskBuilder.newTask()
+        TaskDTO inputDTO = new TaskDTO("Task", "new description", "", "medium");
+
+        Task taskToCreate = TaskBuilder.newTask()
                 .withTitle("Task")
                 .withDescription("new description")
                 .build();
 
+        when(mapper.dtoToTask(inputDTO)).thenReturn(taskToCreate);
         doThrow(new IllegalArgumentException("The document can't be empty"))
-                .when(repository).create(invalidTask);
+                .when(repository).create(any(Task.class));
 
-        OutputDTO result = service.createTask(invalidTask);
+        OutputDTO result = service.createTask(inputDTO);
 
+        assertInstanceOf(ErrorOutputDTO.class, result);
         assertEquals("Something go wrong with data format", result.getOutputState());
-        verify(repository).create(invalidTask);
+
+        verify(mapper).dtoToTask(inputDTO);
+        verify(repository).create(any(Task.class));
+        verify(mapper, never()).taskToDto(any(), any());
     }
 
     @Test
     @DisplayName("Should return error message when database infrastructure failure occurs")
     void createTask_dataAccessException_returnsErrorMessage() {
-        Task newTask = TaskBuilder.newTask()
+        TaskDTO inputDTO = new TaskDTO("New Task", "new description", "", "high");
+
+        Task taskToCreate = TaskBuilder.newTask()
                 .withTitle("New Task")
                 .withDescription("new description")
                 .build();
 
+        when(mapper.dtoToTask(inputDTO)).thenReturn(taskToCreate);
         doThrow(new DataAccessException("MongoDB connection failed"))
-                .when(repository).create(newTask);
+                .when(repository).create(any(Task.class));
 
-        OutputDTO result = service.createTask(newTask);
+        OutputDTO result = service.createTask(inputDTO);
 
+        assertInstanceOf(ErrorOutputDTO.class, result);
         assertEquals("Error raised during task creation. Try again.", result.getOutputState());
-        verify(repository).create(newTask);
-    }
 
+        verify(mapper).dtoToTask(inputDTO);
+        verify(repository).create(any(Task.class));
+        verify(mapper, never()).taskToDto(any(), any());
+    }
     /* =============================== getTaskByID test methods =====================================*/
     @Test
     @DisplayName("GetTaskById must return the task with the requested ID")

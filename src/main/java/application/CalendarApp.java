@@ -6,6 +6,7 @@ import infrastructure.mongo.connection.MongoDBConnection;
 import infrastructure.mongo.dao.MongoTaskDAOAdapter;
 import org.bson.Document;
 import task.mapper.TaskMapper;
+import task.mapper.TaskToDTOMapper;
 import task.model.Task;
 import task.model.TaskBuilder;
 import task.repository.TaskRepository;
@@ -30,7 +31,8 @@ public class CalendarApp {
         taskRepository = new TaskRepositoryImpl(dao, mapper);
 
         // 4. Creamos el Servicio (Negocio)
-        taskService = new TaskService(taskRepository);
+        TaskToDTOMapper mapperDTO = new TaskToDTOMapper();
+        taskService = new TaskService(taskRepository, mapperDTO);
     }
     public static void main(String[] args) {
 
@@ -53,7 +55,8 @@ public class CalendarApp {
                 .withDescription("Comprar dos baguette y dos catalanas")
                 .build();
 
-            taskService.createTask(newTask);
+
+            //taskService.createTask(new);
 
         } catch (Exception e) {
             e.printStackTrace();
