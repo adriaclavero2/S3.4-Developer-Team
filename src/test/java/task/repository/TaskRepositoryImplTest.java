@@ -123,47 +123,49 @@ public class TaskRepositoryImplTest {
     }
 
     @Test
-    @DisplayName("It should return a list of domain tasks when DAO returns documents")
-    void getCompletedTasks_DocumentsExist_ReturnsMappedTaskList() {
+    @DisplayName("It should return a list of domain tasks when DAO returns documents for a given status")
+    void getTasksByStatus_DocumentsExist_ReturnsMappedTaskList() {
 
-        Document doc1 = new Document("title", "Task 1").append("state", "COMPLETED");
-        List<Document> mockDocs = List.of(doc1);
+        TaskState state = TaskState.COMPLETED;
+        Document doc = new Document("title", "Task Test").append("state", state.name());
+        List<Document> mockDocs = List.of(doc);
 
-        Task task1 = TaskBuilder.newTask()
-                .withTitle("Task 1")
+        Task task = TaskBuilder.newTask()
+                .withTitle("Task Test")
                 .withDescription("Testing ReturnsMappedTaskList Description")
-                .withTaskState(TaskState.COMPLETED)
+                .withTaskState(state)
                 .build();
 
-        when(taskDAO.findCompletedTasks()).thenReturn(mockDocs);
-        when(mapper.toDomain(doc1)).thenReturn(task1);
+        when(taskDAO.findTasksByStatus(state)).thenReturn(mockDocs);
+        when(mapper.toDomain(doc)).thenReturn(task);
 
-        List<Task> result = repository.getCompletedTasks();
+        List<Task> result = repository.getTasksByStatus(state);
 
         assertEquals(1, result.size());
-        assertEquals(TaskState.COMPLETED, result.get(0).getTaskState());
-        verify(taskDAO, times(1)).findCompletedTasks();
+        assertEquals(state, result.get(0).getTaskState());
+        verify(taskDAO, times(1)).findTasksByStatus(state);
         verify(mapper, times(1)).toDomain(any(Document.class));
     }
 
     @Test
-    @DisplayName("It should return an empty list when DAO finds no completed tasks")
-    void getCompletedTasks_NoDocuments_ReturnsEmptyList() {
+    @DisplayName("It should return an empty list when DAO finds no no tasks for the given status")
+    void getTasksByStatus_NoDocuments_ReturnsEmptyList() {
+        TaskState state = TaskState.NOT_COMPLETED;
+        when(taskDAO.findTasksByStatus(state)).thenReturn(Collections.emptyList());
 
-        when(taskDAO.findCompletedTasks()).thenReturn(Collections.emptyList());
-
-        List<Task> result = repository.getCompletedTasks();
+        List<Task> result = repository.getTasksByStatus(state);
 
         assertTrue(result.isEmpty());
         verify(mapper, never()).toDomain(any());
     }
 
     @Test
-    @DisplayName("It should propagate DataAccessException when DAO fails")
+    @DisplayName("It should propagate DataAccessException when DAO fails during status lookup")
     void getCompletedTasks_DaoFails_ThrowsDataAccessException() {
+        TaskState state = TaskState.NOT_COMPLETED;
+        when(taskDAO.findTasksByStatus(state)).thenThrow(new DataAccessException("DB Error"));
 
-        when(taskDAO.findCompletedTasks()).thenThrow(new DataAccessException("DB Error"));
-
-        assertThrows(DataAccessException.class, () -> repository.getCompletedTasks());
+        assertThrows(DataAccessException.class, () -> repository.getTasksByStatus(state));
+        verify(taskDAO).findTasksByStatus(state);
     }
 }
