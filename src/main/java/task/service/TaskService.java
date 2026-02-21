@@ -61,20 +61,26 @@ public class TaskService {
         }
     }
 
-    public String updateTask(Task newTask) {
-        if (newTask == null) {
-            return "Error: Task cannot be null";
+    public OutputDTO updateTask(TaskUpdateDTO input) {
+        if (input == null) {
+            throw new IllegalArgumentException("Error: Task cannot be null");
         }
-        if (newTask.getId() == null) {
-            return "Error: Cannot update a task without an ID";
+        if (input.id() == null) {
+            throw new IllegalArgumentException("Error: Cannot update a task without an ID");
         }
         try {
-            repository.modify(newTask);
-            return "Task with _id " + newTask.getId() + " updated successfully";
+            Task existingTask = repository.getById(input.id())
+                    .orElseThrow(() -> new IllegalArgumentException("Task with ID " + input.id() + " not found"));
+
+            Task taskToUpdate = mapper.dtoUpdateToTask(input, existingTask);
+
+            Task updatedTask = repository.modify(taskToUpdate);
+
+            return mapper.taskToDto(updatedTask, "Task with _id " + updatedTask.getId() + " updated successfully");
         } catch (DataAccessException e) {
-            return "Persistence error: " + e.getMessage();
+            return new ErrorOutputDTO("Persistence error: " + e.getMessage());
         } catch (Exception e) {
-            return "Unexpected error: " + e.getMessage();
+            return new ErrorOutputDTO("Unexpected error: " + e.getMessage());
         }
     }
 
