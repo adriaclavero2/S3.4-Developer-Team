@@ -160,9 +160,9 @@ public class TaskRepositoryImplTest {
     }
 
     @Test
-    @DisplayName("It should map the entity to a document and call DAO update")
-    void modify_Positive() {
-        // Given - Usando tu Builder
+    @DisplayName("Should return the updated task when the modification is successful")
+    void modify_ValidTask_ReturnsUpdatedTask() {
+        // Given
         Task mockTask = TaskBuilder.newTask()
                 .withTitle("Testing Title")
                 .withDescription("Testing Description")
@@ -172,20 +172,35 @@ public class TaskRepositoryImplTest {
         Document mockDoc = new Document("_id", "69949f595f811f0d2276b457")
                 .append("title", "Testing Title");
 
-        // Configuramos el comportamiento de los colaboradores
+        Document updatedDocFromMongo = new Document("_id", "69949f595f811f0d2276b457")
+                .append("title", "Testing Title")
+                .append("status", "UPDATED");
+
+        Task updatedTaskEntity = TaskBuilder.newTask()
+                .withTitle("Testing Title")
+                .withDescription("Testing Description")
+                .build();
+        updatedTaskEntity.setId("69949f595f811f0d2276b457");
+
+        // Mocking
         when(mapper.toDocument(mockTask)).thenReturn(mockDoc);
+        when(taskDAO.update(mockDoc)).thenReturn(updatedDocFromMongo);
+        when(mapper.toDomain(updatedDocFromMongo)).thenReturn(updatedTaskEntity);
 
         // When
-        assertDoesNotThrow(() -> repository.modify(mockTask));
+        Task result = repository.modify(mockTask);
 
         // Then
+        assertNotNull(result);
+        assertEquals(updatedTaskEntity, result);
         verify(mapper, times(1)).toDocument(mockTask);
         verify(taskDAO, times(1)).update(mockDoc);
+        verify(mapper, times(1)).toDomain(updatedDocFromMongo);
     }
 
     @Test
-    @DisplayName("It should propagate DataAccessException when the DAO fails")
-    void modify_Negative_DaoFails() {
+    @DisplayName("Should throw DataAccessException when the DAO layer fails")
+    void modify_DaoFails_ThrowsDataAccessException() {
         // Given
         Task mockTask = TaskBuilder.newTask()
                 .withTitle("Failing Task")
@@ -197,15 +212,15 @@ public class TaskRepositoryImplTest {
 
         when(mapper.toDocument(mockTask)).thenReturn(mockDoc);
 
-        // Como el DAO.update es void, usamos doThrow para simular el fallo de red o ID no encontrado
-        doThrow(new DataAccessException("MongoDB connection error"))
-                .when(taskDAO).update(mockDoc);
+        // Mocking the exception
+        when(taskDAO.update(mockDoc))
+                .thenThrow(new DataAccessException("MongoDB connection error"));
 
         // When & Then
         assertThrows(DataAccessException.class, () -> repository.modify(mockTask));
 
-        // Verificamos que aunque falle el DAO, el mapper sí llegó a trabajar
         verify(mapper).toDocument(mockTask);
+        verify(mapper, never()).toDomain(any());
     }
 
     @Test
