@@ -18,7 +18,6 @@ import task.model.TaskBuilder;
 import task.repository.TaskRepository;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class TaskServiceGetTaskByIDTest {
+public class TaskServiceTest {
 
     @Mock
     private TaskToDTOMapper mapper;
@@ -341,75 +340,75 @@ public class TaskServiceGetTaskByIDTest {
     /* =============================== listTasksByStatus test methods =====================================*/
 
     @Test
-    @DisplayName("It should return a formatted list when completed tasks exist")
-    void listTasksByStatus_CompletedTask_ReturnsFormattedString() {
-
+    @DisplayName("listTasksByStatus_CompletedTasksExist_ReturnsTaskListOutputDTO")
+    void listTasksByStatus_CompletedTasksExist_ReturnsTaskListOutputDTO() {
+        // Given
         TaskState state = TaskState.COMPLETED;
-        Task task = TaskBuilder.newTask()
+        Task mockTask = TaskBuilder.newTask()
                 .withTitle("Testing Title")
-                .withDescription("Testing Description")
+                .withDescription("Description")
                 .withPriority(Priority.HIGH)
                 .build();
 
-        when(repository.getTasksByStatus(state)).thenReturn(List.of(task));
+        OutputTaskDTO mockDto = mock(OutputTaskDTO.class);
+        when(repository.getTasksByStatus(state)).thenReturn(List.of(mockTask));
+        when(mapper.taskToDto(eq(mockTask), anyString())).thenReturn(mockDto);
 
-        String result = service.listTasksByStatus(state);
+        // When
+        OutputDTO result = service.listTasksByStatus(state);
 
-        assertTrue(result.contains("Testing Title"));
-        assertTrue(result.contains("[HIGH]"));
-        verify(repository, times(1)).getTasksByStatus(state);
+        // Then
+        assertTrue(result instanceof TaskListOutputDTO);
+        TaskListOutputDTO listResult = (TaskListOutputDTO) result;
+
+        assertEquals(1, listResult.tasks().size());
+        assertEquals("--- COMPLETED TASKS ---", listResult.getOutputState());
+        verify(repository).getTasksByStatus(state);
     }
 
     @Test
-    @DisplayName("It should return a formatted list with priority when pending tasks exist")
-    void listTasksByStatus_PendingTask_ReturnsFormattedString() {
-
-        TaskState state = TaskState.NOT_COMPLETED;
-        Task task = TaskBuilder.newTask()
-                .withTitle("Testing Title")
-                .withDescription("Testing Description")
-                .withPriority(Priority.HIGH)
-                .build();
-
-        when(repository.getTasksByStatus(state)).thenReturn(List.of(task));
-
-        String result = service.listTasksByStatus(state);
-
-        assertTrue(result.contains("Testing Title"));
-        assertTrue(result.contains("[HIGH]"));
-        verify(repository, times(1)).getTasksByStatus(state);
-    }
-
-    @Test
-    @DisplayName("It should return the correct message when no pending tasks are found")
-    void listTasksByStatus_NoPendingTasks_ReturnsSpecificMessage() {
+    @DisplayName("listTasksByStatus_NoPendingTasks_ReturnsErrorOutputDTO")
+    void listTasksByStatus_NoPendingTasks_ReturnsErrorOutputDTO() {
+        // Given
         TaskState state = TaskState.NOT_COMPLETED;
         when(repository.getTasksByStatus(state)).thenReturn(Collections.emptyList());
 
-        String result = service.listTasksByStatus(state);
+        // When
+        OutputDTO result = service.listTasksByStatus(state);
 
-        assertEquals("No pending tasks", result);
+        // Then
+        assertTrue(result instanceof ErrorOutputDTO);
+        assertEquals("No pending tasks", result.getOutputState());
     }
+
     @Test
-    @DisplayName("It should return the correct message when no completed tasks are found")
-    void listTasksByStatus_NoCompletedTasks_ReturnsSpecificMessage() {
+    @DisplayName("listTasksByStatus_NoCompletedTasks_ReturnsErrorOutputDTO")
+    void listTasksByStatus_NoCompletedTasks_ReturnsErrorOutputDTO() {
+        // Given
         TaskState state = TaskState.COMPLETED;
         when(repository.getTasksByStatus(state)).thenReturn(Collections.emptyList());
 
-        String result = service.listTasksByStatus(state);
+        // When
+        OutputDTO result = service.listTasksByStatus(state);
 
-        assertEquals("No tasks completed", result);
+        // Then
+        assertTrue(result instanceof ErrorOutputDTO);
+        assertEquals("No tasks completed", result.getOutputState());
     }
 
     @Test
-    @DisplayName("It should return a persistence error message when repository throws DataAccessException")
-    void listTasksByStatus_RepositoryFails_ReturnsErrorMessage() {
+    @DisplayName("listTasksByStatus_RepositoryFails_ReturnsErrorOutputDTO")
+    void listTasksByStatus_RepositoryFails_ReturnsErrorOutputDTO() {
+        // Given
         TaskState state = TaskState.NOT_COMPLETED;
         when(repository.getTasksByStatus(any())).thenThrow(new DataAccessException("Connection lost"));
 
-        String result = service.listTasksByStatus(state);
+        // When
+        OutputDTO result = service.listTasksByStatus(state);
 
-        assertTrue(result.contains("Persistence error"));
-        assertTrue(result.contains("Connection lost"));
+        // Then
+        assertTrue(result instanceof ErrorOutputDTO);
+        assertTrue(result.getOutputState().contains("Persistence error"));
+        assertTrue(result.getOutputState().contains("Connection lost"));
     }
 }
