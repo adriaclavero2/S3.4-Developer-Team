@@ -1,15 +1,17 @@
-package test;
-
-
-import task.model.Task;
+package task.service;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import task.repository.TaskRepository;
-import task.service.TaskService;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-
-    @ExtendWith
+@ExtendWith(MockitoExtension.class)
     class TaskServiceMockitoTest {
 
         @Mock
@@ -39,4 +41,4 @@ import java.util.Optional;
             System.out.println("✅ Test Negativo con Mockito: ¡Funcionó perfectamente!");
         }
     }
-}
+

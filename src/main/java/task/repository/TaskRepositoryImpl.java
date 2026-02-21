@@ -52,7 +52,6 @@ public class TaskRepositoryImpl implements TaskRepository{
         } catch (Exception e) {
             throw new DataAccessException("Error listing tasks: " + e.getMessage());
         }
-        return List.of();
     }
 
     @Override
