@@ -10,12 +10,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import task.dto.*;
+import task.enums.Priority;
+import task.enums.TaskState;
 import task.mapper.TaskToDTOMapper;
 import task.model.Task;
 import task.model.TaskBuilder;
 import task.repository.TaskRepository;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -242,5 +246,170 @@ public class TaskServiceGetTaskByIDTest {
 
         assertEquals("Error raised during task deletion. Try again.", result.getOutputState());
         verify(repository).remove(validId);
+    }
+
+    /* =============================== update test methods =====================================*/
+
+    @Test
+    @DisplayName("updateTask_ValidRequest_ReturnsOutputTaskDTO")
+    void updateTask_ValidRequest_ReturnsOutputTaskDTO() {
+        String id = "69949f595f811f0d2276b457";
+        TaskUpdateDTO inputDTO = new TaskUpdateDTO(id, "Title", "Desc", "2026-12-31", "HIGH");
+
+        // 1. Usamos la clase exacta que devuelve tu mapper
+        OutputTaskDTO expectedResponse = new OutputTaskDTO(
+                id, "Title", "Desc", "2026-12-31", "2026-02-21", "HIGH", "TODO",
+                "Task with _id " + id + " updated successfully"
+        );
+
+        // 2. Configuramos el mock para que devuelva el objeto correcto
+        when(repository.getById(id)).thenReturn(Optional.of(mock(Task.class)));
+        when(mapper.dtoUpdateToTask(any(), any())).thenReturn(mock(Task.class));
+        when(repository.modify(any())).thenReturn(mock(Task.class));
+
+        // IMPORTANTE: El retorno del mapper debe coincidir con expectedResponse
+        when(mapper.taskToDto(any(Task.class), anyString())).thenReturn(expectedResponse);
+
+        // When
+        OutputDTO result = service.updateTask(inputDTO);
+
+        // Then
+        assertNotNull(result);
+        // Si OutputTaskDTO tiene los datos correctos, el test pasará
+        assertEquals(expectedResponse, result);
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException when the input DTO is null")
+    void updateTask_NullInput_ThrowsIllegalArgumentException() {
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () -> service.updateTask(null));
+    }
+
+    @Test
+    @DisplayName("updateTask_IdNotFound_ReturnsErrorOutputDTO")
+    void updateTask_IdNotFound_ReturnsErrorOutputDTO() {
+        // Given
+        String id = "non-existent";
+        TaskUpdateDTO inputDTO = new TaskUpdateDTO(id, "Title", "Desc", null, null);
+
+        when(repository.getById(id)).thenReturn(Optional.empty());
+
+        // When
+        OutputDTO result = service.updateTask(inputDTO);
+
+        // Then
+        assertTrue(result instanceof ErrorOutputDTO);
+        // Usamos getOutputState() que es el método que implementa tu Record
+        assertTrue(result.getOutputState().contains("not found"));
+    }
+
+    @Test
+    @DisplayName("updateTask_RepositoryFails_ReturnsErrorOutputDTO")
+    void updateTask_RepositoryFails_ReturnsErrorOutputDTO() {
+        // Given
+        String id = "69949f595f811f0d2276b457";
+        TaskUpdateDTO inputDTO = new TaskUpdateDTO(id, "Title", "Desc", null, null);
+        Task existingTask = mock(Task.class);
+
+        when(repository.getById(id)).thenReturn(Optional.of(existingTask));
+        when(mapper.dtoUpdateToTask(any(), any())).thenReturn(mock(Task.class));
+        when(repository.modify(any())).thenThrow(new DataAccessException("DB Connection Lost"));
+
+        // When
+        OutputDTO result = service.updateTask(inputDTO);
+
+        // Then
+        assertTrue(result instanceof ErrorOutputDTO);
+        assertTrue(result.getOutputState().contains("Persistence error"));
+    }
+
+    @Test
+    @DisplayName("updateTask_GeneralException_ReturnsErrorOutputDTO")
+    void updateTask_GeneralException_ReturnsErrorOutputDTO() {
+        // Given
+        TaskUpdateDTO inputDTO = new TaskUpdateDTO("123", "Title", "Desc", null, null);
+        when(repository.getById(any())).thenThrow(new RuntimeException("Fatal Crash"));
+
+        // When
+        OutputDTO result = service.updateTask(inputDTO);
+
+        // Then
+        assertTrue(result instanceof ErrorOutputDTO);
+        assertTrue(result.getOutputState().contains("Unexpected error"));
+    }
+    /* =============================== listTasksByStatus test methods =====================================*/
+
+    @Test
+    @DisplayName("It should return a formatted list when completed tasks exist")
+    void listTasksByStatus_CompletedTask_ReturnsFormattedString() {
+
+        TaskState state = TaskState.COMPLETED;
+        Task task = TaskBuilder.newTask()
+                .withTitle("Testing Title")
+                .withDescription("Testing Description")
+                .withPriority(Priority.HIGH)
+                .build();
+
+        when(repository.getTasksByStatus(state)).thenReturn(List.of(task));
+
+        String result = service.listTasksByStatus(state);
+
+        assertTrue(result.contains("Testing Title"));
+        assertTrue(result.contains("[HIGH]"));
+        verify(repository, times(1)).getTasksByStatus(state);
+    }
+
+    @Test
+    @DisplayName("It should return a formatted list with priority when pending tasks exist")
+    void listTasksByStatus_PendingTask_ReturnsFormattedString() {
+
+        TaskState state = TaskState.NOT_COMPLETED;
+        Task task = TaskBuilder.newTask()
+                .withTitle("Testing Title")
+                .withDescription("Testing Description")
+                .withPriority(Priority.HIGH)
+                .build();
+
+        when(repository.getTasksByStatus(state)).thenReturn(List.of(task));
+
+        String result = service.listTasksByStatus(state);
+
+        assertTrue(result.contains("Testing Title"));
+        assertTrue(result.contains("[HIGH]"));
+        verify(repository, times(1)).getTasksByStatus(state);
+    }
+
+    @Test
+    @DisplayName("It should return the correct message when no pending tasks are found")
+    void listTasksByStatus_NoPendingTasks_ReturnsSpecificMessage() {
+        TaskState state = TaskState.NOT_COMPLETED;
+        when(repository.getTasksByStatus(state)).thenReturn(Collections.emptyList());
+
+        String result = service.listTasksByStatus(state);
+
+        assertEquals("No pending tasks", result);
+    }
+    @Test
+    @DisplayName("It should return the correct message when no completed tasks are found")
+    void listTasksByStatus_NoCompletedTasks_ReturnsSpecificMessage() {
+        TaskState state = TaskState.COMPLETED;
+        when(repository.getTasksByStatus(state)).thenReturn(Collections.emptyList());
+
+        String result = service.listTasksByStatus(state);
+
+        assertEquals("No tasks completed", result);
+    }
+
+    @Test
+    @DisplayName("It should return a persistence error message when repository throws DataAccessException")
+    void listTasksByStatus_RepositoryFails_ReturnsErrorMessage() {
+        TaskState state = TaskState.NOT_COMPLETED;
+        when(repository.getTasksByStatus(any())).thenThrow(new DataAccessException("Connection lost"));
+
+        String result = service.listTasksByStatus(state);
+
+        assertTrue(result.contains("Persistence error"));
+        assertTrue(result.contains("Connection lost"));
     }
 }
