@@ -13,6 +13,6 @@ public interface GenericDAO<T, ID> {
     T save(T entity);
     Optional<T> findByID(ID id);
     List<T> findAll();
-    void update(T entity);
+    T update(T entity);
     void delete(ID id);
 }
