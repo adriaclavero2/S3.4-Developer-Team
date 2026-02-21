@@ -4,6 +4,7 @@ import common.exception.DataAccessException;
 import common.persistance.TaskDAO;
 import common.utils.Mapper;
 import org.bson.Document;
+import task.enums.TaskState;
 import task.mapper.TaskMapper;
 import task.model.Task;
 
@@ -45,12 +46,12 @@ public class TaskRepositoryImpl implements TaskRepository{
     }
 
     @Override
-    public void modify(Task entity) {
+    public Task modify(Task entity) {
 
             Document doc = mapper.toDocument(entity);
-            taskDAO.update(doc);
-            System.out.println("Log: task updated successfully");
+            Document updatedDoc = taskDAO.update(doc);
 
+            return mapper.toDomain(updatedDoc);
     }
 
     @Override
