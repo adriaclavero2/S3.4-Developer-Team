@@ -4,10 +4,12 @@ import common.exception.DataAccessException;
 import common.exception.InvalidTaskIDException;
 import common.exception.TaskNotFoundException;
 import task.dto.*;
+import task.enums.TaskState;
 import task.mapper.TaskToDTOMapper;
 import task.model.Task;
 import task.repository.TaskRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public class TaskService {
@@ -84,30 +86,26 @@ public class TaskService {
         }
     }
 
-    public String listTasksByStatus(TaskState state) {
+    public OutputDTO listTasksByStatus(TaskState state) {
         try {
             List<Task> tasks = repository.getTasksByStatus(state);
 
             if (tasks.isEmpty()) {
-                return state == TaskState.COMPLETED ? "No tasks completed" : "No pending tasks";
+                String emptyMessage = (state == TaskState.COMPLETED) ? "No tasks completed" : "No pending tasks";
+                return new ErrorOutputDTO(emptyMessage);
             }
 
-            String header = state == TaskState.COMPLETED ? "--- COMPLETED TASKS ---" : "--- PENDING TASKS ---";
-            StringBuilder sb = new StringBuilder(header).append("\n");
-            for (Task task : tasks) {
-                sb.append(String.format("- [%s] %s: %s (Created: %s, Finished: %s)\n",
-                        task.getPriority(),
-                        task.getTitle(),
-                        task.getDescription(),
-                        task.getCreationDate(),
-                        task.getExpireDate()));
-            }
-            return sb.toString();
+            String header = (state == TaskState.COMPLETED) ? "--- COMPLETED TASKS ---" : "--- PENDING TASKS ---";
+
+            List<OutputTaskDTO> taskDTOs = tasks.stream()
+                    .map(task -> mapper.taskToDto(task, "Listed"))
+                    .toList();
+            return new TaskListOutputDTO(taskDTOs, header);
 
         } catch (DataAccessException e) {
-            return "Persistence error: " + e.getMessage();
+            return new ErrorOutputDTO("Persistence error: " + e.getMessage());
         } catch (Exception e) {
-            return "Unexpected error: " + e.getMessage();
+            return new ErrorOutputDTO("Unexpected error: " + e.getMessage());
         }
     }
 
