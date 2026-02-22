@@ -56,15 +56,13 @@ public class TaskToDTOMapper {
                 ? Priority.valueOf(dto.priority().toUpperCase())
                 : existingTask.getPriority();
 
-        Task task = TaskBuilder.newTask()
+        return  TaskBuilder.update(existingTask)
                 .withTitle(dto.title() != null ? dto.title() : existingTask.getTitle())
                 .withDescription(dto.description() != null ? dto.description() : existingTask.getDescription())
                 .withExpireDate(expireDate)
                 .withPriority(priority)
                 .withTaskState(existingTask.getTaskState())
                 .build();
-        task.setId(existingTask.getId());
 
-        return task;
     }
 }
