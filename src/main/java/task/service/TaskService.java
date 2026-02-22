@@ -23,7 +23,7 @@ public class TaskService {
 
     public OutputDTO createTask(TaskDTO input) {
         if(input == null){
-            throw new IllegalArgumentException("CreateTask: Task cannot be null");
+            return new ErrorOutputDTO("CreateTask: Task cannot be null");
         }
 
         try {
@@ -65,14 +65,19 @@ public class TaskService {
 
     public OutputDTO updateTask(TaskUpdateDTO input) {
         if (input == null) {
-            throw new IllegalArgumentException("Error: Task cannot be null");
+            return new ErrorOutputDTO("Error: Task cannot be null");
         }
         if (input.id() == null) {
-            throw new IllegalArgumentException("Error: Cannot update a task without an ID");
+            return new ErrorOutputDTO("Error: Cannot update a task without an ID");
+        }
+
+        Optional<Task> taskOptional = repository.getById(input.id());
+
+        if (taskOptional.isEmpty()) {
+            return new ErrorOutputDTO("Task with ID " + input.id() + " not found");
         }
         try {
-            Task existingTask = repository.getById(input.id())
-                    .orElseThrow(() -> new IllegalArgumentException("Task with ID " + input.id() + " not found"));
+            Task existingTask = taskOptional.get();
 
             Task taskToUpdate = mapper.dtoUpdateToTask(input, existingTask);
 
