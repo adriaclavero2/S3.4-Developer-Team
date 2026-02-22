@@ -3,6 +3,7 @@ package infrastructur.mongo.dao;
 import com.mongodb.MongoException;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.result.UpdateResult;
 import common.exception.DataAccessException;
 import com.mongodb.client.result.DeleteResult;
@@ -152,14 +153,27 @@ public class MongoTaskDAOAdapterTest {
     }
 
     @Test
-    @DisplayName("It should complete successfully when the document is updated in MongoDB")
-    void update_ExistingDocument_CompletesSuccessfully() {
-        Document doc = new Document("_id", "69949f595f811f0d2276b457").append("title", "Test");
-        when(collection.updateOne(any(Document.class), any(Document.class))).thenReturn(updateResult);
-        when(updateResult.getMatchedCount()).thenReturn(1L);
+    @DisplayName("It should return the updated document when the update is successful")
+    void update_ExistingDocument_ReturnsUpdatedDocument() {
+        // Given
+        String id = "69949f595f811f0d2276b457";
+        Document inputDoc = new Document("_id", id).append("title", "Updated Title");
+        Document mockUpdatedDoc = new Document("_id", id).append("title", "Updated Title").append("status", "TODO");
 
-        assertDoesNotThrow(() -> dao.update(doc));
-        verify(collection, times(1)).updateOne(any(Document.class), any(Document.class));
+        // IMPORTANTE: Ahora mockeamos findOneAndUpdate, no updateOne
+        when(collection.findOneAndUpdate(any(Bson.class), any(Bson.class), any(FindOneAndUpdateOptions.class)))
+                .thenReturn(mockUpdatedDoc);
+
+        // When
+        Document result = dao.update(inputDoc);
+
+        // Then
+        assertNotNull(result);
+        assertEquals("Updated Title", result.get("title"));
+        assertEquals(id, result.get("_id"));
+
+        // Verificamos que se llamó al método correcto con opciones
+        verify(collection, times(1)).findOneAndUpdate(any(Bson.class), any(Bson.class), any(FindOneAndUpdateOptions.class));
     }
 
     @Test
@@ -168,13 +182,13 @@ public class MongoTaskDAOAdapterTest {
         // Given
         String id = "69949f595f811f0d2276b457";
         Document doc = new Document("_id", id);
-        when(collection.updateOne(any(Document.class), any(Document.class))).thenReturn(updateResult);
-        when(updateResult.getMatchedCount()).thenReturn(0L); // Simulamos que MongoDB no encontró el ID
+
+        // findOneAndUpdate devuelve null si no encuentra el documento
+        when(collection.findOneAndUpdate(any(Bson.class), any(Bson.class), any(FindOneAndUpdateOptions.class)))
+                .thenReturn(null);
 
         // When & Then
         DataAccessException ex = assertThrows(DataAccessException.class, () -> dao.update(doc));
-
-        // Verificamos que el mensaje de error sea el esperado
         assertTrue(ex.getMessage().contains("Task with _id " + id + " not found."));
     }
 
@@ -183,15 +197,27 @@ public class MongoTaskDAOAdapterTest {
     void update_MongoDbError_ThrowsDataAccessException() {
         // Given
         Document doc = new Document("_id", "123");
-        // Simulamos un error interno de MongoDB (ej. timeout o pérdida de conexión)
-        when(collection.updateOne(any(Document.class), any(Document.class)))
+        when(collection.findOneAndUpdate(any(Bson.class), any(Bson.class), any(FindOneAndUpdateOptions.class)))
                 .thenThrow(new RuntimeException("Connection lost"));
 
         // When & Then
         DataAccessException ex = assertThrows(DataAccessException.class, () -> dao.update(doc));
 
         assertTrue(ex.getMessage().contains("MongoDB update error"));
-        assertTrue(ex.getCause() instanceof RuntimeException);
+    }
+
+    @Test
+    @DisplayName("It should throw DataAccessException when the input document has no _id")
+    void update_NoIdInDocument_ThrowsDataAccessException() {
+        // Given: Un documento sin la clave "_id"
+        Document doc = new Document("title", "No ID");
+
+        // When & Then
+        DataAccessException ex = assertThrows(DataAccessException.class, () -> dao.update(doc));
+        assertEquals("Cannot update a document without _id", ex.getMessage());
+
+        // Verificamos que ni siquiera intentó ir a la base de datos
+        verify(collection, never()).findOneAndUpdate(any(Bson.class), any(Bson.class), any(FindOneAndUpdateOptions.class));
     }
 
     @Test

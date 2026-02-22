@@ -2,6 +2,7 @@ package task.mapper;
 
 import task.dto.OutputTaskDTO;
 import task.dto.TaskDTO;
+import task.dto.TaskUpdateDTO;
 import task.enums.Priority;
 import task.model.Task;
 import task.model.TaskBuilder;
@@ -44,5 +45,24 @@ public class TaskToDTOMapper {
                 outputState);
 
         return output;
+    }
+
+    public Task dtoUpdateToTask(TaskUpdateDTO dto, Task existingTask) {
+        LocalDateTime expireDate = (dto.expireDate() != null && !dto.expireDate().isEmpty())
+                ? LocalDate.parse(dto.expireDate(), onlyDateFormatter).atTime(23, 59, 59)
+                : existingTask.getExpireDate() ;
+
+        Priority priority = (dto.priority() != null && !dto.priority().isEmpty())
+                ? Priority.valueOf(dto.priority().toUpperCase())
+                : existingTask.getPriority();
+
+        return  TaskBuilder.update(existingTask)
+                .withTitle(dto.title() != null ? dto.title() : existingTask.getTitle())
+                .withDescription(dto.description() != null ? dto.description() : existingTask.getDescription())
+                .withExpireDate(expireDate)
+                .withPriority(priority)
+                .withTaskState(existingTask.getTaskState())
+                .build();
+
     }
 }
