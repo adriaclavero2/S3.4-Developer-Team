@@ -9,8 +9,10 @@ import task.mapper.TaskToDTOMapper;
 import task.model.Task;
 import task.repository.TaskRepository;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class TaskService {
     private final TaskRepository repository;
@@ -36,6 +38,24 @@ public class TaskService {
             return new ErrorOutputDTO("Error raised during task creation. Try again.");
         }
     }
+
+    public OutputDTO getAllTasks() {
+        try {
+
+            List<Task> tasks = repository.getAll().stream()
+                    .sorted(Comparator.comparing(Task::getExpireDate, Comparator.nullsLast(Comparator.naturalOrder())))
+                    .toList();
+
+            List<OutputTaskDTO> tasksDTOs = tasks.stream()
+                    .map(task -> mapper.taskToDto(task, "Task list successfully retrieved"))
+                    .toList();
+
+            return new TaskListOutputDTO(tasksDTOs, "Tasks list successfully retrieved");
+        } catch (DataAccessException e) {
+            return new ErrorOutputDTO("Error raised during task retrieval. Try again.");
+        }
+    }
+
 
     public OutputDTO getTaskById(TaskIdDTO idDTO) {
         String id = idDTO.id();

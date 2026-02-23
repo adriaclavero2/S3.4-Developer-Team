@@ -6,7 +6,7 @@ import java.util.Properties;
 public class MongoBuilder implements ConnectionStringBuilder {
     @Override
     public String stringBuild(Properties props) {
-        return String.format("mongodb://%s:%s@%s:%s",
+        return String.format("mongodb://%s:%s@%s:%s/?authSource=admin",
                 props.getProperty("mongodb.username"),
                 props.getProperty("mongodb.password"),
                 props.getProperty("mongodb.host"),

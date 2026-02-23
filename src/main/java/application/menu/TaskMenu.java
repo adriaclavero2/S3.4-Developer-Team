@@ -1,7 +1,9 @@
 package application.menu;
 
+import common.utils.MenuPrinter;
 import task.dto.*;
 import task.enums.Priority;
+import task.enums.TaskState;
 import task.service.TaskService;
 
 import java.time.LocalDate;
@@ -15,6 +17,7 @@ import static common.utils.MenuPrinter.*;
 public class TaskMenu {
     private final Scanner scanner;
     private final TaskService taskService;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     private final DateTimeFormatter onlyDateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     public TaskMenu(Scanner scanner, TaskService taskService) {
@@ -72,7 +75,64 @@ public class TaskMenu {
     }
 
     private void listTasks() {
+        int option = -1;
 
+        do {
+            MenuPrinter.listTaskMenu();
+
+            while (!scanner.hasNextInt()) {
+                System.out.print("Introduce a valid option: ");
+                scanner.nextLine();
+            }
+
+            option = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (option) {
+                case 1 -> listAllTasks();
+                case 2 -> listCompletedTasks();
+                case 3 -> listPendingTasks();
+                case 0 -> System.out.println("Going back to task menu...");
+                default -> System.out.println("Invalid option");
+            }
+
+        } while(option != 0);
+    }
+
+    private void listAllTasks() {
+        System.out.println("\n--- LIST ALL TASKS ---");
+
+//        OutputDTO result = taskService.getAllTasks();
+
+//        if (result instanceof TaskListOutputDTO success) {
+//            MenuPrinter.printTaskList(success);
+//        } else if (result instanceof  ErrorOutputDTO error) {
+//            System.err.println("Error: " + error.getOutputState());
+//        }
+    }
+
+    private void listCompletedTasks() {
+        System.out.println("\n--- LIST COMPLETED TASKS ---");
+
+        OutputDTO result = taskService.listTasksByStatus(TaskState.COMPLETED);
+
+        if (result instanceof TaskListOutputDTO success) {
+            MenuPrinter.printTaskList(success);
+        } else if (result instanceof  ErrorOutputDTO error) {
+            System.err.println("Error: " + error.getOutputState());
+        }
+    }
+
+    private void listPendingTasks() {
+        System.out.println("\n--- LIST PENDING TASKS ---");
+
+        OutputDTO result = taskService.listTasksByStatus(TaskState.NOT_COMPLETED);
+
+        if (result instanceof TaskListOutputDTO success) {
+            MenuPrinter.printTaskList(success);
+        } else if (result instanceof  ErrorOutputDTO error) {
+            System.err.println("Error: " + error.getOutputState());
+        }
     }
 
     private void getTaskById() {
@@ -149,7 +209,6 @@ public class TaskMenu {
     private void deleteTask() {
 
     }
-
     // ================= MÉTODOS AUXILIARES (CLEAN INPUT) =================
 
 
@@ -174,10 +233,10 @@ public class TaskMenu {
             System.out.println(inputField);
             String input = scanner.nextLine();
             try {
-                LocalDate.parse(input);
+                LocalDate.parse(inputField, onlyDateFormatter);
                 return input;
             } catch (DateTimeParseException e) {
-                System.out.println("Invalid format. Use dd-MM-yyyy format (31-12-2026");
+                System.out.println("Invalid format. Use dd-MM-YYYY format (31-12-2026");
             }
         }
     }

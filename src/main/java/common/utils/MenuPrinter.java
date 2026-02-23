@@ -21,10 +21,10 @@ public class MenuPrinter {
     public static void printTaskMenu() {
         System.out.println("\\=============== TASK ===============\\");
         System.out.println("\\  1. Create new task                \\");
-        System.out.println("\\  2. Find task by ID                \\");
-        System.out.println("\\  3. List tasks                     \\");
-        System.out.println("\\  4. Update task                    \\");
-        System.out.println("\\  5. Mark task as completed         \\");
+        System.out.println("\\  2. List tasks                     \\");
+        System.out.println("\\  3. Find task by ID                \\");
+        System.out.println("\\  4. Mark task as completed         \\");
+        System.out.println("\\  5. Update task                    \\");
         System.out.println("\\  6. Delete task                    \\");
         System.out.println("\\  0. Back to main menu              \\");
         System.out.println("\\====================================\\");
@@ -37,7 +37,6 @@ public class MenuPrinter {
             return;
         }
 
-        System.out.println("\n====== Tasks list ======");
         for (OutputTaskDTO dto : tasks.tasks()) {
             System.out.println("-----------------------------------");
             System.out.println("Id: " + dto.id());

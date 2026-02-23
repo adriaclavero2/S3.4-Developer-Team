@@ -146,10 +146,12 @@ public class TaskServiceTest {
     void testGetTaskById_Positive() {
         String id = "69949f595f811f0d2276b457";
 
+
         Task mockTask = TaskBuilder.newTask()
                 .withTitle("Testing Title")
                 .withDescription("Description")
                 .build();
+
         mockTask.setId(id);
 
         OutputTaskDTO expectedOutput = new OutputTaskDTO(
