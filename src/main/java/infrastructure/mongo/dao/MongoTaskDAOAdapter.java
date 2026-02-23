@@ -62,7 +62,11 @@ public class MongoTaskDAOAdapter implements TaskDAO {
 
     @Override
     public List<Document> findAll() {
-        return List.of();
+        try{
+            return collection.find().into(new ArrayList<>());
+        } catch (MongoException e) {
+            throw new DataAccessException("Error listing all documents", e);
+        }
     }
 
     @Override
