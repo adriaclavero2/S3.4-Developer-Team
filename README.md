@@ -106,7 +106,7 @@ El módulo de tareas es el núcleo del sistema y destaca por su robustez:
 ---
 
 ## 💾 Persistencia Híbrida (Infrastructure)
-### 💾 Persistencia Flexbile y Extensible
+### Persistencia Flexbile y Extensible
 
 Actualmente, el sistema utiliza **MongoDB** como motor principal, aprovechando una persistencia **No-SQL** basada en documentos para gestionar estructuras de datos flexibles y dinámicas.
 
