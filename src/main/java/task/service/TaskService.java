@@ -12,7 +12,6 @@ import task.repository.TaskRepository;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class TaskService {
     private final TaskRepository repository;
@@ -41,7 +40,6 @@ public class TaskService {
 
     public OutputDTO getAllTasks() {
         try {
-
             List<Task> tasks = repository.getAll().stream()
                     .sorted(Comparator.comparing(Task::getExpireDate, Comparator.nullsLast(Comparator.naturalOrder())))
                     .toList();
@@ -134,5 +132,27 @@ public class TaskService {
         }
     }
 
+    public OutputDTO markTaskAsCompleted(TaskIdDTO idDTO) {
+        try{
+            String id = idDTO.id();
+            Optional<Task> taskOptional = repository.getById(id);
 
+            if(taskOptional.isEmpty())
+                return new ErrorOutputDTO("The task " + id + " is not present");
+
+            Task task = taskOptional.get();
+
+            if(task.getTaskState() == TaskState.COMPLETED) {
+                return new HappyOutputDTO("Information: The task was already marked as completed.");
+            }
+
+            task.setTaskState(TaskState.COMPLETED);
+            Task updatedTask = repository.modify(task);
+
+            return mapper.taskToDto(updatedTask, "Task successfully updated");
+
+        } catch (Exception e) {
+            return new ErrorOutputDTO("Unexpected error while updating the task");
+        }
+    }
 }
