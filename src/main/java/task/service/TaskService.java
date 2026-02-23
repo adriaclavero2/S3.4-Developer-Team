@@ -39,16 +39,21 @@ public class TaskService {
         }
     }
 
-    public TaskListOutputDTO getAllTasks() {
-        List<Task> tasks = repository.getAll().stream()
-                .sorted(Comparator.comparing(Task::getExpireDate, Comparator.nullsLast(Comparator.naturalOrder())))
-                .toList();
+    public OutputDTO getAllTasks() {
+        try {
 
-        List<OutputTaskDTO> tasksDTOs = tasks.stream()
-                .map(task -> mapper.taskToDto(task, "Task list successfully retrieved"))
-                .toList();
+            List<Task> tasks = repository.getAll().stream()
+                    .sorted(Comparator.comparing(Task::getExpireDate, Comparator.nullsLast(Comparator.naturalOrder())))
+                    .toList();
 
-        return new TaskListOutputDTO(tasksDTOs, "Tasks list successfully retrieved");
+            List<OutputTaskDTO> tasksDTOs = tasks.stream()
+                    .map(task -> mapper.taskToDto(task, "Task list successfully retrieved"))
+                    .toList();
+
+            return new TaskListOutputDTO(tasksDTOs, "Tasks list successfully retrieved");
+        } catch (DataAccessException e) {
+            return new ErrorOutputDTO("Error raised during task retrieval. Try again.");
+        }
     }
 
 
