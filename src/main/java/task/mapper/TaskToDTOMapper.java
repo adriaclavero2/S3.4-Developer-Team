@@ -31,7 +31,7 @@ public class TaskToDTOMapper {
 
     public OutputTaskDTO taskToDto(Task task, String outputState) {
         String creationDate = task.getCreationDate().format(formatter);
-        String expireDate = task.getExpireDate() != null ? task.getCreationDate().format(formatter) : "undefined";
+        String expireDate = task.getExpireDate() != null ? task.getExpireDate().format(formatter) : "undefined";
 
 
         OutputTaskDTO output = new OutputTaskDTO(
@@ -57,8 +57,8 @@ public class TaskToDTOMapper {
                 : existingTask.getPriority();
 
         return  TaskBuilder.update(existingTask)
-                .withTitle(dto.title() != null ? dto.title() : existingTask.getTitle())
-                .withDescription(dto.description() != null ? dto.description() : existingTask.getDescription())
+                .withTitle((dto.title() != null && !dto.title().isBlank()) ? dto.title() : existingTask.getTitle())
+                .withDescription((dto.description() != null && !dto.title().isBlank()) ? dto.description() : existingTask.getDescription())
                 .withExpireDate(expireDate)
                 .withPriority(priority)
                 .withTaskState(existingTask.getTaskState())
