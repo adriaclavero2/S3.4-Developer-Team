@@ -61,6 +61,19 @@ public class MenuPrinter {
         System.out.println("|==================================================|");
     }
 
+    public static void printATask(OutputTaskDTO dto) {
+        String expireDate = dto.expireDate() != null ? dto.expireDate() : "unknown";
+
+        System.out.println("|======================= TASK =====================|");
+        System.out.println("| Id: " + dto.id() +                              "|");
+        System.out.println("| Title: " + dto.title() +                        "|");
+        System.out.println("| Description: " + dto.description() +            "|");
+        System.out.println("| Expire date " + expireDate +                    "|");
+        System.out.println("| Priority: " + dto.id() +                        "|");
+        System.out.println("| State: " + dto.taskState() +                    "|");
+        System.out.println("|==================================================|");
+    }
+
     public static void listTaskMenu() {
         System.out.println("\\=============== TASK ===============\\");
         System.out.println("\\  1. List all tasks                 \\");
@@ -116,4 +129,5 @@ public class MenuPrinter {
         System.out.println("| Task with id : " + id + " successfully deleted!   |");
         System.out.println("|===================================================|");
     }
+
 }
