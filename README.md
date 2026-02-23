@@ -12,7 +12,7 @@ Nuestra aplicación se basa en una separación estricta de responsabilidades, fa
 
 ```
 S3.4_Developer-Team
-├── scr
+├── src
 │   ├── main
 │   │   ├── java
 │   │   │   ├── application
@@ -113,14 +113,10 @@ Para asegurar la calidad del software (**Clean Code**), hemos implementado:
 | **Maven**    | Gestión del proyecto              |
 | **MongoDB**  | Persistencia de datos NoSQL       |
 | **Docker**   | Contenerización de bases de datos |
-| **GitHub**   | Taabajo con Gitflow               |
+| **JUnit 5**  | Testing                           |
+| **GitHub**   | Trabajo con Gitflow               |
 
 ## 🚦 Instalación y Ejecución
-
-### Requisitos Previos
-* **Java 21** (LTS)
-* **Maven 3.9+**
-* **Docker** (para contenedores de base de datos)
 
 ### Pasos para empezar
 1.  **Levantar la infraestructura (Docker):**
