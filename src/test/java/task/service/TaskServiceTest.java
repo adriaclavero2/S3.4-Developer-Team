@@ -79,16 +79,14 @@ public class TaskServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when TaskDTO is null")
-    void createTask_nullTask_throwsIllegalArgumentException() {
+    @DisplayName("Should return ErrorOutputDTO when TaskDTO is null")
+    void createTask_nullTask_returnsErrorMessage() {
         TaskDTO nullTaskDTO = null;
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> service.createTask(nullTaskDTO)
-        );
+        OutputDTO result = service.createTask(nullTaskDTO);
 
-        assertEquals("CreateTask: Task cannot be null", exception.getMessage());
+        assertInstanceOf(ErrorOutputDTO.class, result);
+        assertEquals("CreateTask: Task cannot be null", result.getOutputState());
         verifyNoInteractions(repository);
         verifyNoInteractions(mapper);
     }
@@ -281,10 +279,12 @@ public class TaskServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when the input DTO is null")
-    void updateTask_NullInput_ThrowsIllegalArgumentException() {
-        // When & Then
-        assertThrows(IllegalArgumentException.class, () -> service.updateTask(null));
+    @DisplayName("Should return ErrorOutputDTO when the input DTO is null")
+    void updateTask_NullInput_ReturnsErrorOutputDTO() {
+        OutputDTO result = service.updateTask(null);
+
+        assertInstanceOf(ErrorOutputDTO.class, result);
+        assertEquals("Error: Task cannot be null", result.getOutputState());
     }
 
     @Test
@@ -323,21 +323,6 @@ public class TaskServiceTest {
         // Then
         assertTrue(result instanceof ErrorOutputDTO);
         assertTrue(result.getOutputState().contains("Persistence error"));
-    }
-
-    @Test
-    @DisplayName("updateTask_GeneralException_ReturnsErrorOutputDTO")
-    void updateTask_GeneralException_ReturnsErrorOutputDTO() {
-        // Given
-        TaskUpdateDTO inputDTO = new TaskUpdateDTO("123", "Title", "Desc", null, null);
-        when(repository.getById(any())).thenThrow(new RuntimeException("Fatal Crash"));
-
-        // When
-        OutputDTO result = service.updateTask(inputDTO);
-
-        // Then
-        assertTrue(result instanceof ErrorOutputDTO);
-        assertTrue(result.getOutputState().contains("Unexpected error"));
     }
     /* =============================== listTasksByStatus test methods =====================================*/
 
@@ -413,4 +398,144 @@ public class TaskServiceTest {
         assertTrue(result.getOutputState().contains("Persistence error"));
         assertTrue(result.getOutputState().contains("Connection lost"));
     }
+
+/* ====================================== markTaskAsCompleted Test methods ========================================= */
+@Test
+@DisplayName("Should mark task as completed successfully")
+void markTaskAsCompleted_validTask_success() {
+    String id = "69949f595f811f0d2276b457";
+    TaskIdDTO idDTO = new TaskIdDTO(id);
+
+    Task mockTask = TaskBuilder.newTask()
+            .withTitle("Task")
+            .withDescription("Desc")
+            .build();
+    mockTask.setId(id);
+    mockTask.setTaskState(TaskState.NOT_COMPLETED);
+
+    Task updatedTask = TaskBuilder.newTask()
+            .withTitle("Task")
+            .withDescription("Desc")
+            .build();
+    updatedTask.setId(id);
+    updatedTask.setTaskState(TaskState.COMPLETED);
+
+    OutputTaskDTO expectedOutput = new OutputTaskDTO(
+            id, "Task", "Desc", null, "2026-02-21", "MEDIUM", "COMPLETED",
+            "Task successfully updated"
+    );
+
+    when(repository.getById(id)).thenReturn(Optional.of(mockTask));
+    when(repository.modify(any(Task.class))).thenReturn(updatedTask);
+    when(mapper.taskToDto(updatedTask, "Task successfully updated")).thenReturn(expectedOutput);
+
+    OutputDTO result = service.markTaskAsCompleted(idDTO);
+
+    assertInstanceOf(OutputTaskDTO.class, result);
+    assertEquals("Task successfully updated", result.getOutputState());
+    verify(repository).getById(id);
+    verify(repository).modify(any(Task.class));
+}
+
+    @Test
+    @DisplayName("Should return error when task not found")
+    void markTaskAsCompleted_taskNotFound_returnsError() {
+        String id = "non-existent-id";
+        TaskIdDTO idDTO = new TaskIdDTO(id);
+
+        when(repository.getById(id)).thenReturn(Optional.empty());
+
+        OutputDTO result = service.markTaskAsCompleted(idDTO);
+
+        assertInstanceOf(ErrorOutputDTO.class, result);
+        assertEquals("The task " + id + " is not present", result.getOutputState());
+        verify(repository).getById(id);
+        verify(repository, never()).modify(any());
+    }
+
+    @Test
+    @DisplayName("Should return info message when task already completed")
+    void markTaskAsCompleted_alreadyCompleted_returnsInfo() {
+        String id = "69949f595f811f0d2276b457";
+        TaskIdDTO idDTO = new TaskIdDTO(id);
+
+        Task mockTask = TaskBuilder.newTask()
+                .withTitle("Task")
+                .withDescription("Desc")
+                .build();
+        mockTask.setId(id);
+        mockTask.setTaskState(TaskState.COMPLETED);
+
+        when(repository.getById(id)).thenReturn(Optional.of(mockTask));
+
+        OutputDTO result = service.markTaskAsCompleted(idDTO);
+
+        assertInstanceOf(HappyOutputDTO.class, result);
+        assertEquals("Information: The task was already marked as completed.", result.getOutputState());
+        verify(repository).getById(id);
+        verify(repository, never()).modify(any());
+    }
+
+    @Test
+    @DisplayName("Should return error when exception occurs")
+    void markTaskAsCompleted_exceptionThrown_returnsError() {
+        String id = "69949f595f811f0d2276b457";
+        TaskIdDTO idDTO = new TaskIdDTO(id);
+
+        when(repository.getById(id)).thenThrow(new RuntimeException("Database error"));
+
+        OutputDTO result = service.markTaskAsCompleted(idDTO);
+
+        assertInstanceOf(ErrorOutputDTO.class, result);
+        assertEquals("Unexpected error while updating the task", result.getOutputState());
+    }
+
+    /* =============================== getAllTasks test methods =====================================*/
+
+    @Test
+    @DisplayName("Should return sorted task list when tasks exist")
+    void getAllTasks_tasksExist_returnsSortedList() {
+        Task task1 = TaskBuilder.newTask()
+                .withTitle("Task 1")
+                .withDescription("Description 1")
+                .build();
+        task1.setId("1");
+
+        Task task2 = TaskBuilder.newTask()
+                .withTitle("Task 2")
+                .withDescription("Description 2")
+                .build();
+        task2.setId("2");
+
+        List<Task> tasks = List.of(task1, task2);
+        OutputTaskDTO dto1 = mock(OutputTaskDTO.class);
+        OutputTaskDTO dto2 = mock(OutputTaskDTO.class);
+
+        when(repository.getAll()).thenReturn(tasks);
+        when(mapper.taskToDto(task1, "Task list successfully retrieved")).thenReturn(dto1);
+        when(mapper.taskToDto(task2, "Task list successfully retrieved")).thenReturn(dto2);
+
+        OutputDTO result = service.getAllTasks();
+
+        assertInstanceOf(TaskListOutputDTO.class, result);
+        TaskListOutputDTO listResult = (TaskListOutputDTO) result;
+        assertEquals("Tasks list successfully retrieved", listResult.getOutputState());
+        assertEquals(2, listResult.tasks().size());
+
+        verify(repository).getAll();
+        verify(mapper, times(2)).taskToDto(any(), eq("Task list successfully retrieved"));
+    }
+
+    @Test
+    @DisplayName("Should return error when repository fails")
+    void getAllTasks_repositoryFails_returnsError() {
+        when(repository.getAll()).thenThrow(new DataAccessException("Connection failed"));
+
+        OutputDTO result = service.getAllTasks();
+
+        assertInstanceOf(ErrorOutputDTO.class, result);
+        assertEquals("Error raised during task retrieval. Try again.", result.getOutputState());
+    }
+
+
 }
