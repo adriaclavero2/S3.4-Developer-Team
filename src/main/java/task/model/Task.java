@@ -23,6 +23,10 @@ public class Task {
         this.priority = Priority.MEDIUM;
         this.taskState = TaskState.NOT_COMPLETED;
     }
+    protected Task(Task existingTask) {
+        this.id = existingTask.id;
+        this.creationDate = existingTask.creationDate;
+    }
 
     public String getId() {
         return id;
