@@ -1,9 +1,6 @@
 package application.menu;
 
-import task.dto.ErrorOutputDTO;
-import task.dto.OutputDTO;
-import task.dto.OutputTaskDTO;
-import task.dto.TaskDTO;
+import task.dto.*;
 import task.enums.Priority;
 import task.service.TaskService;
 
@@ -63,7 +60,7 @@ public class TaskMenu {
         OutputDTO result = taskService.createTask(dto);
 
         if (result instanceof OutputTaskDTO success) {
-            //printMenuCreateTask(success);
+            //printCreateTask(success);
         } else if (result instanceof ErrorOutputDTO error) {
             System.err.println("Error: " + error.outputState());
         }
@@ -74,6 +71,19 @@ public class TaskMenu {
     }
 
     private void getTaskById() {
+        System.out.println("\n--- FIND TASK BY ID ---");
+
+        String idTask = readString("Enter _id of the task you want to find : ");
+
+        TaskIdDTO dto = new TaskIdDTO(idTask);
+
+        OutputDTO result = taskService.getTaskById(dto);
+
+        if (result instanceof  OutputTaskDTO success) {
+            //prinFindTaskById
+        } else if (result instanceof  ErrorOutputDTO error) {
+            System.err.println("Error: " + error.outputState());
+        }
 
     }
 
