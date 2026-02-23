@@ -1,6 +1,8 @@
 package application;
 
+import application.menu.MainMenu;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import common.persistance.TaskDAO;
 import infrastructure.mongo.connection.MongoDBConnection;
 import infrastructure.mongo.dao.MongoTaskDAOAdapter;
@@ -13,55 +15,48 @@ import task.repository.TaskRepository;
 import task.repository.TaskRepositoryImpl;
 import task.service.TaskService;
 
+import java.util.Scanner;
+
 public class CalendarApp {
 
     private static TaskRepository taskRepository;
     private static TaskService taskService;
+    private static Scanner scanner;
+    private static MainMenu mainMenu;
 
     private static void init() {
 
-        // 1. Obtenemos la colección (Infraestructura)
-        MongoCollection<Document> collection = MongoDBConnection.getDatabase().getCollection("tasks");
-        // 2. Creamos el adaptador (DAO)
-        //GenericDAO<?, ?> taskDao = new MongoTaskDAOAdapter(database.getCollection("tasks"));
-        TaskDAO dao = new MongoTaskDAOAdapter((collection));
+        try {
+            scanner = new Scanner(System.in);
 
-        // 3. Creamos el Repositorio con su Mapper (Persistencia/Datos)
-        TaskMapper mapper = new TaskMapper();
-        taskRepository = new TaskRepositoryImpl(dao, mapper);
+            MongoDatabase database = MongoDBConnection.getDatabase();
 
-        // 4. Creamos el Servicio (Negocio)
-        TaskToDTOMapper mapperDTO = new TaskToDTOMapper();
-        taskService = new TaskService(taskRepository, mapperDTO);
+            MongoCollection<Document> taskCollection = database.getCollection("tasks");
+
+            TaskDAO taskDao = new MongoTaskDAOAdapter(taskCollection);
+
+            TaskMapper taskMapper = new TaskMapper();
+            taskRepository = new TaskRepositoryImpl(taskDao, taskMapper);
+
+            TaskToDTOMapper mapperDTO = new TaskToDTOMapper();
+            taskService = new TaskService(taskRepository, mapperDTO);
+
+            mainMenu = new MainMenu(scanner, taskService);
+
+            System.out.println("System initialized correctly");
+        } catch (Exception e) {
+            System.err.println("Fatal error in init(): " + e.getMessage());
+            throw new RuntimeException(e);  // Para interrumpir el programa y evitar que se execute igualmente el menu.
+        }
     }
     public static void main(String[] args) {
 
         try {
-            // Inicializamos todas las capas antes de empezar
             init();
-
-            // Si llegamos aquí, la conexión es real
-            System.out.println("✅ CONNECTED TO THE DOCKER CONTAINER");
-            System.out.println("🔌 Working on the DB: " + MongoDBConnection.getDatabase().getName());
-
-
-            // Una pequeña prueba extra: listar colecciones
-            for (String name : MongoDBConnection.getDatabase().listCollectionNames()) {
-                System.out.println("📁 Collection found: " + name);
-            }
-
-            Task newTask = TaskBuilder.newTask()
-                .withTitle("Comprar el pan")
-                .withDescription("Comprar dos baguette y dos catalanas")
-                .build();
-
-
-            //taskService.createTask(new);
-
+            mainMenu.init();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("CRITICAL ERROR!!!");;
         } finally {
-            //Cerramos la conexion al terminar
             MongoDBConnection.close();
         }
     }
