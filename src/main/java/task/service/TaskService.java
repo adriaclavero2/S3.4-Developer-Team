@@ -36,10 +36,16 @@ public class TaskService {
                 .orElseThrow(() -> new TaskNotFoundException("Error 404: Task not found with ID: " + id));
     }
 
-    public List<Task> getAllTasks() {
-        return repository.getAll().stream()
+    public TaskListOutputDTO getAllTasks() {
+        List<Task> tasks = repository.getAll().stream()
                 .sorted(Comparator.comparing(Task::getExpireDate, Comparator.nullsLast(Comparator.naturalOrder())))
+                .toList();
+
+        List<OutputTaskDTO> tasksDTOs = tasks.stream()
+                .map(task -> taskMapper.toOutputDTO(task))
                 .collect(Collectors.toList());
+
+        return new TaskListOutputDTO(taskDTOs);
     }
 
     public void completeTask(String id) {
