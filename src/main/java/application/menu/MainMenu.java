@@ -33,8 +33,8 @@ public class MainMenu {
 
             switch (option) {
                 case 1 -> {
-                    // TaskMenu taskMenu = new TaskMenu(scanner, TaskService);
-                    // taskMenu.start();
+                     TaskMenu taskMenu = new TaskMenu(scanner, taskService);
+                     taskMenu.start();
                 }
 
                 case 2 -> {
