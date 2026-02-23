@@ -72,6 +72,13 @@ public class MenuPrinter {
     }
 
     public static void updateTaskMenu() {
+        System.out.println("\\============ UPDATE TASK ============\\");
+        System.out.println("\\  1. Change title                    \\");
+        System.out.println("\\  2. Change description              \\");
+        System.out.println("\\  3. Change expiration date          \\");
+        System.out.println("\\  4. Change priority                 \\");
+        System.out.println("\\  0. Back to task menu               \\");
+        System.out.println("\\=====================================\\");
 
     }
 
