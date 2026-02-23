@@ -1,11 +1,10 @@
 package task.dto;
 
-public record OutputTaskDTO(
+public record TaskUpdateDTO(
         String id,
         String title,
         String description,
         String expireDate,
-        String creationDate,
-        String priority,
-        String taskState
-) {}
+        String priority) {
+
+}

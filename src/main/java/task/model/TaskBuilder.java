@@ -15,6 +15,10 @@ public class TaskBuilder {
         return new Builder();
     }
 
+    public static TitleStep update(Task existingTask) {
+        return new Builder(existingTask);
+    }
+
     private static class Builder implements TitleStep {
         private Task newTask;
 
@@ -22,7 +26,10 @@ public class TaskBuilder {
             this.newTask = new Task();
         }
 
-        @Override
+        private Builder(Task existingTask) {
+            this.newTask = new Task(existingTask);
+        }
+
         public DescriptionStep withTitle(String title) {
             validateTitle(title);
             this.newTask.setTitle(title);
@@ -169,6 +176,8 @@ public class TaskBuilder {
                 return newTask;
             }
         }
+
+
 
         // ================ VALIDATION PRIVATE METHODS ====================
 
