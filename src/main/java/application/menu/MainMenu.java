@@ -1,5 +1,6 @@
 package application.menu;
 
+import common.utils.MenuPrinter;
 import task.service.TaskService;
 
 import java.util.Scanner;
@@ -19,7 +20,9 @@ public class MainMenu {
         int option = -1;
 
         do {
-            // printMainMenu
+
+            MenuPrinter.printMainMenu();
+
             while(!scanner.hasNextInt()) {
                 System.out.println("Insert a valid input. Try again.");
                 scanner.nextLine();
