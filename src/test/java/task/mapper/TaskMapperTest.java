@@ -64,7 +64,7 @@ class TaskMapperTest {
     @Test
     public void toDomainTest() {
         Document doc = Document.parse(
-                "{\"_id\": {\"$oid\": \"6990e9b370a7995f9586f160\"},\"title\": \"Comprar el pan\",\"description\": null,\"expiredAt\": null,\"priority\": \"MEDIUM\",\"status\": \"NOT_COMPLETED\",\"createdAt\": \"2026-02-14T22:31:31.985215\"}"
+                "{\"_id\": {\"$oid\": \"6990e9b370a7995f9586f160\"},\"title\": \"Comprar el pan\",\"description\": \"cualquiercosa\",\"expiredAt\": null,\"priority\": \"MEDIUM\",\"status\": \"NOT_COMPLETED\",\"createdAt\": \"2026-02-14T22:31:31.985215\"}"
         );
 
         Task task = taskMapper.toDomain(doc);
