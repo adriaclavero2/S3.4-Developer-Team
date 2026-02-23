@@ -1,4 +1,24 @@
+<div align="center">
+
 # 📅 S3.4-Developer-Team - Agenda
+
+**Desarrollado por:**
+[Federico Praticò](https://github.com/federicopratico) • [Adrià Clavero Monteagudo](https://github.com/adriaclavero2) • [Federico Cantore](https://github.com/FedEx8525)
+
+*(IT Academy Java Bootcamp - Proyecto Colaborativo)*
+
+---
+
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+![Maven](https://img.shields.io/badge/Apache%20Maven-C71A36?style=for-the-badge&logo=Apache%20Maven&logoColor=white)
+![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)
+</div>
+
+---
+
+## 📖 Introducción
 
 Bienvenido a nuestro **Proyecto**, una Agenda desarrollada en Java para la gestión de Tareas. Este proyecto ha sido diseñado bajo principios de **Clean Architecture**, permitiendo una total independencia entre la lógica de negocio y los motores de persistencia.  Además está pensada para la escalabilidad y la implementación de dos dominios más como note y event.
 
