@@ -15,7 +15,6 @@ import static common.utils.MenuPrinter.*;
 public class TaskMenu {
     private final Scanner scanner;
     private final TaskService taskService;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     private final DateTimeFormatter onlyDateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     public TaskMenu(Scanner scanner, TaskService taskService) {
