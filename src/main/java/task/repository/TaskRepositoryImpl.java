@@ -36,14 +36,10 @@ public class TaskRepositoryImpl implements TaskRepository{
 
     @Override
     public List<Task> getAll() {
-        try {
-            List<Document> documents = taskDAO.findAll();
-            return documents.stream()
-                    .map(doc -> mapper.toDomain(doc))
-                    .toList();
-        } catch (Exception e) {
-            throw new DataAccessException("Error listing tasks: " + e.getMessage());
-        }
+        List<Document> documents = taskDAO.findAll();
+        return documents.stream()
+                .map(doc -> mapper.toDomain(doc))
+                .toList();
     }
 
     @Override
