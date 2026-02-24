@@ -6,6 +6,12 @@ import task.dto.TaskListOutputDTO;
 import java.time.LocalDate;
 
 public class MenuPrinter {
+    private static final int width = 50;
+
+    private static void printBoxLine(String content, int width) {
+        System.out.printf("| %-" + (width-2) + "s |%n", content);
+    }
+
     public static void printMainMenu() {
         System.out.println("\\========== Calendar =========\\");
         System.out.println("\\                             \\");
@@ -52,12 +58,12 @@ public class MenuPrinter {
         String expireDate = dto.expireDate() != null ? dto.expireDate() : "unknown";
 
         System.out.println("|=================== CREATED TASK =================|");
-        System.out.println("| Id: " + dto.id() +                              "|");
-        System.out.println("| Title: " + dto.title() +                        "|");
-        System.out.println("| Description: " + dto.description() +            "|");
-        System.out.println("| Expire date " + expireDate +                    "|");
-        System.out.println("| Priority: " + dto.priority() +                        "|");
-        System.out.println("| State: " + dto.taskState() +                    "|");
+        printBoxLine("Id: " + dto.id(), width);
+        printBoxLine("Title: " + dto.title(), width);
+        printBoxLine("Description: " + dto.description(), width);
+        printBoxLine("Priority: " + dto.priority(), width);
+        printBoxLine("Expire date: " + expireDate, width);
+        printBoxLine("State: " + dto.taskState(), width);
         System.out.println("|==================================================|");
     }
 
@@ -65,12 +71,12 @@ public class MenuPrinter {
         String expireDate = dto.expireDate() != null ? dto.expireDate() : "unknown";
 
         System.out.println("|======================= TASK =====================|");
-        System.out.println("| Id: " + dto.id() +                              "|");
-        System.out.println("| Title: " + dto.title() +                        "|");
-        System.out.println("| Description: " + dto.description() +            "|");
-        System.out.println("| Expire date " + expireDate +                    "|");
-        System.out.println("| Priority: " + dto.priority() +                  "|");
-        System.out.println("| State: " + dto.taskState() +                    "|");
+        printBoxLine("Id: " + dto.id(), width);
+        printBoxLine("Title: " + dto.title(), width);
+        printBoxLine("Description: " + dto.description(), width);
+        printBoxLine("Priority: " + dto.priority(), width);
+        printBoxLine("Expire date: " + expireDate, width);
+        printBoxLine("State: " + dto.taskState(), width);
         System.out.println("|==================================================|");
     }
 
@@ -98,12 +104,12 @@ public class MenuPrinter {
         String expireDate = dto.expireDate() != null ? dto.expireDate() : "unknown";
 
         System.out.println("|================== UPDATED TASK ==================|");
-        System.out.println("| Id: " + dto.id() +                              "|");
-        System.out.println("| Title: " + dto.title() +                        "|");
-        System.out.println("| Description: " + dto.description() +            "|");
-        System.out.println("| Expire date " + expireDate +                    "|");
-        System.out.println("| Priority: " + dto.priority() +                  "|");
-        System.out.println("| State: " + dto.taskState() +                    "|");
+        printBoxLine("Id: " + dto.id(), width);
+        printBoxLine("Title: " + dto.title(), width);
+        printBoxLine("Description: " + dto.description(), width);
+        printBoxLine("Priority: " + dto.priority(), width);
+        printBoxLine("Expire date: " + expireDate, width);
+        printBoxLine("State: " + dto.taskState(), width);
         System.out.println("|==================================================|");
     }
 
