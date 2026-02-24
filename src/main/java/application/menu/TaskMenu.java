@@ -145,7 +145,7 @@ public class TaskMenu {
         OutputDTO result = taskService.getTaskById(dto);
 
         if (result instanceof  OutputTaskDTO success) {
-            printCreatedTask( success);
+            printFoundTask( success);
         } else if (result instanceof  ErrorOutputDTO error) {
             System.err.println("Error: " + error.getOutputState());
         }
