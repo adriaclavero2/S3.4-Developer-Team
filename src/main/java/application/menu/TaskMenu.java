@@ -1,12 +1,15 @@
 package application.menu;
 
+import common.exception.TaskExpireDateInPastException;
 import common.utils.MenuPrinter;
+import common.utils.Validator;
 import task.dto.*;
 import task.enums.Priority;
 import task.enums.TaskState;
 import task.service.TaskService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
@@ -266,11 +269,15 @@ public class TaskMenu {
         while (true) {
             System.out.println(inputField);
             String input = scanner.nextLine();
+
+            if(input.isBlank()) return null;
+
             try {
-                LocalDate.parse(input, onlyDateFormatter);
+                LocalDateTime dateToValidate = LocalDate.parse(input, onlyDateFormatter).atTime(23,59,59);
+                Validator.validateExpireDate(dateToValidate);
                 return input;
-            } catch (DateTimeParseException e) {
-                System.out.println("Invalid format. Use dd-MM-YYYY format (31-12-2026");
+            } catch (DateTimeParseException | TaskExpireDateInPastException e) {
+                System.out.println("Invalid format. Use dd-MM-YYYY format (31-12-2026)");
             }
         }
     }
