@@ -1,6 +1,7 @@
 package task.model;
 
 import common.exception.InvalidTaskDescriptionException;
+import common.utils.Validator;
 import task.model.BuilderSteps.*;
 import task.model.Task;
 import task.enums.Priority;
@@ -8,6 +9,8 @@ import task.enums.TaskState;
 import common.exception.InvalidTaskTitleException;
 import common.exception.TaskExpireDateInPastException;
 import java.time.LocalDateTime;
+
+import static common.utils.Validator.*;
 
 public class TaskBuilder {
 
@@ -174,39 +177,6 @@ public class TaskBuilder {
             @Override
             public Task build() {
                 return newTask;
-            }
-        }
-
-
-
-        // ================ VALIDATION PRIVATE METHODS ====================
-
-        private void validateTitle(String title) {
-            if (title == null) {
-                throw new InvalidTaskTitleException("Task title cannot be null");
-            }
-            if (title.trim().isEmpty()) {
-                throw new InvalidTaskTitleException("Task title cannot be empty");
-            }
-            if (title.length() > 200) {
-                throw new InvalidTaskTitleException("Task title cannot exceed 200 characters");
-            }
-        }
-
-        private void validateDescription(String description) {
-            if (description == null) {
-                throw new InvalidTaskDescriptionException(InvalidTaskDescriptionException.NULL_DESCRIPTION_ERROR);
-            }
-            if (description.trim().isEmpty()) {
-                throw new InvalidTaskDescriptionException(InvalidTaskDescriptionException.EMPTY_DESCRIPTION_ERROR);
-            }
-        }
-
-        private void validateExpireDate(LocalDateTime expireDate) {
-            if (expireDate != null && expireDate.isBefore(LocalDateTime.now())) {
-                throw new TaskExpireDateInPastException(
-                        "Task expire date cannot be in the past: " + expireDate
-                );
             }
         }
     }
