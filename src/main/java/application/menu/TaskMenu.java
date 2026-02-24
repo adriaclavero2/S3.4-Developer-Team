@@ -233,7 +233,7 @@ public class TaskMenu {
             System.out.println(inputField);
             String input = scanner.nextLine();
             try {
-                LocalDate.parse(inputField, onlyDateFormatter);
+                LocalDate.parse(input, onlyDateFormatter);
                 return input;
             } catch (DateTimeParseException e) {
                 System.out.println("Invalid format. Use dd-MM-YYYY format (31-12-2026");
