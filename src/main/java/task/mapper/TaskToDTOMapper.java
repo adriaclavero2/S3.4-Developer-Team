@@ -16,8 +16,8 @@ public class TaskToDTOMapper {
     private DateTimeFormatter onlyDateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     public Task dtoToTask(TaskDTO dto) {
-        LocalDateTime expireDate = !dto.expireDate().isEmpty() ? LocalDate.parse(dto.expireDate(), onlyDateFormatter).atTime(23, 59, 59) : null;
-        Priority priority = !dto.priority().isEmpty() ? Priority.valueOf(dto.priority().toUpperCase()) : Priority.MEDIUM;
+        LocalDateTime expireDate = (dto.expireDate() != null && !dto.expireDate().isEmpty()) ? LocalDate.parse(dto.expireDate(), onlyDateFormatter).atTime(23, 59, 59) : null;
+        Priority priority = (dto.priority() != null && !dto.priority().isEmpty()) ? Priority.valueOf(dto.priority().toUpperCase()) : Priority.MEDIUM;
 
         Task task = TaskBuilder.newTask()
                 .withTitle(dto.title())
