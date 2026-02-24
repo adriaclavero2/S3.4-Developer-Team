@@ -64,12 +64,12 @@ public class MenuPrinter {
     public static void printFoundTask(OutputTaskDTO dto) {
         String expireDate = dto.expireDate() != null ? dto.expireDate() : "unknown";
 
-        System.out.println("|=================== FOUND TASK =================|");
+        System.out.println("|=================== FOUND TASK ===================|");
         System.out.println("| Id: " + dto.id() +                              "|");
         System.out.println("| Title: " + dto.title() +                        "|");
         System.out.println("| Description: " + dto.description() +            "|");
         System.out.println("| Expire date " + expireDate +                    "|");
-        System.out.println("| Priority: " + dto.id() +                        "|");
+        System.out.println("| Priority: " + dto.priority() +                  "|");
         System.out.println("| State: " + dto.taskState() +                    "|");
         System.out.println("|==================================================|");
     }
@@ -102,7 +102,7 @@ public class MenuPrinter {
         System.out.println("| Title: " + dto.title() +                        "|");
         System.out.println("| Description: " + dto.description() +            "|");
         System.out.println("| Expire date " + expireDate +                    "|");
-        System.out.println("| Priority: " + dto.id() +                        "|");
+        System.out.println("| Priority: " + dto.priority() +                  "|");
         System.out.println("| State: " + dto.taskState() +                    "|");
         System.out.println("|==================================================|");
     }
