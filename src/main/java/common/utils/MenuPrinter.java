@@ -61,10 +61,10 @@ public class MenuPrinter {
         System.out.println("|==================================================|");
     }
 
-    public static void printFoundTask(OutputTaskDTO dto) {
+    public static void printATask(OutputTaskDTO dto) {
         String expireDate = dto.expireDate() != null ? dto.expireDate() : "unknown";
 
-        System.out.println("|=================== FOUND TASK ===================|");
+        System.out.println("|======================= TASK =====================|");
         System.out.println("| Id: " + dto.id() +                              "|");
         System.out.println("| Title: " + dto.title() +                        "|");
         System.out.println("| Description: " + dto.description() +            "|");
@@ -129,4 +129,5 @@ public class MenuPrinter {
         System.out.println("| Task with id : " + id + " successfully deleted!   |");
         System.out.println("|===================================================|");
     }
+
 }

@@ -78,7 +78,7 @@ public class TaskMenu {
         int option = -1;
 
         do {
-            MenuPrinter.listTaskMenu();
+            listTaskMenu();
 
             while (!scanner.hasNextInt()) {
                 System.out.print("Introduce a valid option: ");
@@ -102,13 +102,13 @@ public class TaskMenu {
     private void listAllTasks() {
         System.out.println("\n--- LIST ALL TASKS ---");
 
-//        OutputDTO result = taskService.getAllTasks();
+        OutputDTO result = taskService.getAllTasks();
 
-//        if (result instanceof TaskListOutputDTO success) {
-//            MenuPrinter.printTaskList(success);
-//        } else if (result instanceof  ErrorOutputDTO error) {
-//            System.err.println("Error: " + error.getOutputState());
-//        }
+        if (result instanceof TaskListOutputDTO success) {
+            printTaskList(success);
+        } else if (result instanceof  ErrorOutputDTO error) {
+            System.err.println("Error: " + error.getOutputState());
+        }
     }
 
     private void listCompletedTasks() {
@@ -117,7 +117,7 @@ public class TaskMenu {
         OutputDTO result = taskService.listTasksByStatus(TaskState.COMPLETED);
 
         if (result instanceof TaskListOutputDTO success) {
-            MenuPrinter.printTaskList(success);
+            printTaskList(success);
         } else if (result instanceof  ErrorOutputDTO error) {
             System.err.println("Error: " + error.getOutputState());
         }
@@ -129,7 +129,7 @@ public class TaskMenu {
         OutputDTO result = taskService.listTasksByStatus(TaskState.NOT_COMPLETED);
 
         if (result instanceof TaskListOutputDTO success) {
-            MenuPrinter.printTaskList(success);
+            printTaskList(success);
         } else if (result instanceof  ErrorOutputDTO error) {
             System.err.println("Error: " + error.getOutputState());
         }
@@ -153,7 +153,21 @@ public class TaskMenu {
     }
 
     private void markTaskCompleted() {
+        System.out.println("\n--- MARK TASK AS COMPLETED ---");
 
+        String idTask = readString("Enter _id of the task you want to mark as completed: ");
+
+        TaskIdDTO dto = new TaskIdDTO(idTask);
+
+        OutputDTO result = taskService.markTaskAsCompleted(dto);
+
+        if (result instanceof  OutputTaskDTO success) {
+            printUpdatedTask(success);
+        } else if (result instanceof  ErrorOutputDTO error) {
+            System.err.println("Error: " + error.getOutputState());
+        } else if (result instanceof HappyOutputDTO alreadyCompleted) {
+            System.out.println("Attention: " + alreadyCompleted.getOutputState());
+        }
     }
 
     private void updateTask() {
@@ -207,7 +221,27 @@ public class TaskMenu {
     }
 
     private void deleteTask() {
+        System.out.println("\n--- DELETE TASK ---");
+        String idTask = readString("Enter _id of the task yuo want to delete: ");
+        TaskIdDTO dto = new TaskIdDTO(idTask);
 
+        String confirmation = "";
+        OutputDTO result = taskService.getTaskById(dto);
+
+        if(result instanceof ErrorOutputDTO error) {
+            System.err.println("Error: " + error.getOutputState());
+        } else if (result instanceof OutputTaskDTO success) {
+            printATask(success);
+            confirmation = readString("\nConfirm task deletion (y/n): ");
+        }
+
+        switch (confirmation.toLowerCase().charAt(0)) {
+            case 'y' -> result = taskService.removeTask(dto);
+            case 'n' -> System.out.println("deletion aborted.");
+            default -> System.out.println("select an available option. Exit deletion process...");
+        };
+
+        if(result instanceof HappyOutputDTO success) System.out.println(success.getOutputState());
     }
     // ================= MÉTODOS AUXILIARES (CLEAN INPUT) =================
 
