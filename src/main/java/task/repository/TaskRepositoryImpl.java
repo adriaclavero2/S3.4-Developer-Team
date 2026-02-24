@@ -38,7 +38,7 @@ public class TaskRepositoryImpl implements TaskRepository{
     public List<Task> getAll() {
         List<Document> documents = taskDAO.findAll();
         return documents.stream()
-                .map(doc -> mapper.toDomain(doc))
+                .map(mapper::toDomain)
                 .toList();
     }
 
